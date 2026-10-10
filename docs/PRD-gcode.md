@@ -1,10 +1,21 @@
-# PRD: KAgents — 自然语言电路设计与制造助手
+# PRD: Gcode — 自然语言电路设计与制造助手
 
-> 状态：v0.1 草案 · 2026-10-10
+> 状态：v0.2 · 2026-10-10（v0.1 曾用名 KAgents，已正式定名 Gcode；新增架构约束节）
+
+## 0. 架构约束（v0.2 新增）
+
+- **主题框架**：基于 `/opt/workspace/jcode`（Jcode 本体，Rust workspace，82 个 crate）构建，复用其 agent runtime、Tool trait（`jcode-tool-core`）、TUI/CLI、会话与权限体系
+- **CLI 入口**：Rust 实现，以新二进制 `gcode` 落在 Jcode workspace 内（`[[bin]] name = "gcode"`），领域能力以 `gcode-*` crate 系列实现：
+  - `gcode-kicad`：s-expression 解析/生成、`.kicad_sch`/`.kicad_pcb` 读写、ERC/DRC 桥接（kicad-cli）
+  - `gcode-sim`：ngspice 驱动（DC/AC/瞬态）、波形取回与解读
+  - `gcode-instrument`：Sigrok/串口实测采集、仿真-实测对比
+  - `gcode-laser`：Gerber→GRBL G-code、SVG 走刀预览、参数知识库
+  - `gcode-tools`：实现 `jcode_tool_core::Tool` trait，把上述能力注册为 agent 工具
+- **交互形态**：CLI 对话（复用 Jcode CLI 骨架），文件系统为与 KiCad GUI 的同步媒介，无 GUI 插件
 
 ## 1. 摘要
 
-KAgents 是一个 CLI 形态的专业 code agent，让用户用自然语言完成 KiCad 电路设计、SPICE 仿真验证、实际电路测试和激光 PCB 制造。KiCad 10 的开放格式（s-expression、kicad-cli、IPC API、内置 ngspice）首次让这类 agent 成为可能。
+Gcode 是一个 CLI 形态的专业 code agent，让用户用自然语言完成 KiCad 电路设计、SPICE 仿真验证、实际电路测试和激光 PCB 制造。KiCad 10 的开放格式（s-expression、kicad-cli、IPC API、内置 ngspice）首次让这类 agent 成为可能。
 
 ## 2. 联系人
 
@@ -44,7 +55,7 @@ KAgents 是一个 CLI 形态的专业 code agent，让用户用自然语言完�
 - **What after**：几小时内得到设计正确性初步验证过的电路，不用先学一个月工具
 - **替代品**：ChatGPT 问答（无工程产出）、教程自学（周期长）；选我们因为直接产出可制造的设计
 
-> 一句话：你负责想电路要做什么，KAgents 负责让它变成验证过的设计。
+> 一句话：你负责想电路要做什么，Gcode 负责让它变成验证过的设计。
 
 ### S2 KiCad 用户
 - **Who**：日常使用 KiCad 的电子工程师
@@ -67,7 +78,7 @@ KAgents 是一个 CLI 形态的专业 code agent，让用户用自然语言完�
 ### 7.1 关键流程
 
 ```
-用户(CLI 对话) ──→ KAgents agent
+用户(CLI 对话) ──→ Gcode agent
                       ├─ P0 设计：NL → 结构化网表 → 确定性生成 .kicad_sch → ERC → 解读
                       ├─ P1 仿真：NL → ngspice 配置（DC/AC/瞬态）→ 波形/波特图 → 解读建议
                       ├─ P1.5 实测：驱动测量硬件采集真实电路数据 → 与仿真对比
