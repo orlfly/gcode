@@ -2,7 +2,7 @@
   (version 20260306)
   (generator "gcode")
   (generator_version "10.0")
-  (uuid "e237412c-b614-523e-acce-1b91ac626522")
+  (uuid "dfd43e20-bc50-5246-9481-410ebfd3ef6c")
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -358,7 +358,7 @@
     (pin "1" (uuid "a36cda8e-ef05-5925-93ca-5a55dd5e56ad"))
     (instances (project
   "gcode"
-  (path "/e237412c-b614-523e-acce-1b91ac626522" (reference "#FLG1") (unit 1))
+  (path "/dfd43e20-bc50-5246-9481-410ebfd3ef6c" (reference "#FLG1") (unit 1))
 ))
   )
   (symbol
@@ -411,7 +411,7 @@
     (pin "1" (uuid "6c656b1a-f529-5f15-a6b6-034f955d95d6"))
     (instances (project
   "gcode"
-  (path "/e237412c-b614-523e-acce-1b91ac626522" (reference "#FLG2") (unit 1))
+  (path "/dfd43e20-bc50-5246-9481-410ebfd3ef6c" (reference "#FLG2") (unit 1))
 ))
   )
   (symbol
@@ -464,7 +464,7 @@
     (pin "1" (uuid "fa5159e6-3ff7-52b7-a537-1a94b27b7e7f"))
     (instances (project
   "gcode"
-  (path "/e237412c-b614-523e-acce-1b91ac626522" (reference "#FLG3") (unit 1))
+  (path "/dfd43e20-bc50-5246-9481-410ebfd3ef6c" (reference "#FLG3") (unit 1))
 ))
   )
   (symbol
@@ -488,7 +488,7 @@
     )
     (property
       "Value"
-      "10k"
+      "91k"
       (at 77.216 97.79 0)
       (show_name no)
       (do_not_autoplace no)
@@ -516,7 +516,7 @@
     (pin "2" (uuid "66b0a935-4b4d-5e03-a964-f4fee59eb331"))
     (instances (project
   "gcode"
-  (path "/e237412c-b614-523e-acce-1b91ac626522" (reference "R1") (unit 1))
+  (path "/dfd43e20-bc50-5246-9481-410ebfd3ef6c" (reference "R1") (unit 1))
 ))
   )
   (symbol
@@ -540,7 +540,7 @@
     )
     (property
       "Value"
-      "91k"
+      "10k"
       (at 77.216 115.57 0)
       (show_name no)
       (do_not_autoplace no)
@@ -568,7 +568,7 @@
     (pin "2" (uuid "09556d7f-b158-52c1-8498-43ce4ddb384e"))
     (instances (project
   "gcode"
-  (path "/e237412c-b614-523e-acce-1b91ac626522" (reference "R2") (unit 1))
+  (path "/dfd43e20-bc50-5246-9481-410ebfd3ef6c" (reference "R2") (unit 1))
 ))
   )
   (symbol
@@ -623,7 +623,7 @@
     (pin "5" (uuid "9cecf2b2-1857-5e1e-86f5-92f8f72bae52"))
     (instances (project
   "gcode"
-  (path "/e237412c-b614-523e-acce-1b91ac626522" (reference "U1") (unit 1))
+  (path "/dfd43e20-bc50-5246-9481-410ebfd3ef6c" (reference "U1") (unit 1))
 ))
   )
   (label

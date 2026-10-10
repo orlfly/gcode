@@ -39,12 +39,12 @@ KR1 原文：10 个典型电路从自然语言描述到通过 ERC + 仿真的 Ki
   - 预期：fc = 1.6 kHz (R=1k, C=100n)
 - **RC 高通滤波**（`rc-highpass`）：100nF 电容串在输入上、1k 电阻到地，做约 1.6kHz 的高通滤波
   - 预期：fc = 1.6 kHz (C=100n, R=1k)
-- **同相放大器**（`non-inverting-amp`）：用 LM321 做同相放大器，增益约 10 倍（10k 和 91k 反馈电阻）
-  - 预期：Gain = 1 + 91k/10k = 10.1
+- **同相放大器**（`non-inverting-amp`）：用 LM321 做同相放大器，增益约 10 倍（91k 反馈、10k 到地）
+  - 预期：Gain = 1 + R1/R2 = 1 + 91k/10k = 10.1
 - **反相放大器**（`inverting-amp`）：用 LM321 做反相放大器，增益约 -10 倍（10k 输入、100k 反馈）
   - 预期：Gain = -100k/10k = -10
 - **二阶有源低通（Sallen-Key）**（`sallen-key-lowpass`）：用 LM321 做 Sallen-Key 二阶低通，截止频率约 1kHz
-  - 预期：fc ~= 1.07 kHz (R1=R2=10k, C1=10n, C2=22n)
+  - 预期：f0 = 1.07 kHz (R1=R2=10k, C1=22n, C2=10n), Q ~ 0.74
 - **线性稳压（L7805）**（`ldo-regulator`）：用 L7805 把 12V 降到 5V，输入输出各加 100nF 去耦
   - 预期：VOUT = 5V from VIN = 12V; OUT pin is power_out (self-driven)
 - **LED 限流驱动**（`led-driver`）：5V 电源通过 330 欧姆电阻驱动一个 LED，电流约 9mA
@@ -52,7 +52,7 @@ KR1 原文：10 个典型电路从自然语言描述到通过 ERC + 仿真的 Ki
 - **N-MOSFET 低边开关**（`mosfet-switch`）：用 N 沟道 MOSFET 做低边开关驱动 LED，栅极 10k 串阻加 100k 下拉
   - 预期：Gate driven via 10k, 100k pulldown; LED load in drain path
 - **热敏电阻分压接口**（`thermistor-divider`）：10k 上拉电阻和 NTC 热敏电阻分压，输出接到 ADC 测温度
-  - 预期：V_sense = VCC x R_ntc/(10k + R_ntc)
+  - 预期：V_sense = VCC x R_ntc/(10k + R_ntc); at nominal 10k -> VCC/2
 
 ## 结论与遗留
 

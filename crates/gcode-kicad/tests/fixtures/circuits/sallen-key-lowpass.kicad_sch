@@ -2,7 +2,7 @@
   (version 20260306)
   (generator "gcode")
   (generator_version "10.0")
-  (uuid "5782830c-dd13-587d-9cdf-02b44439b44e")
+  (uuid "1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8")
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -454,7 +454,7 @@
     (pin "1" (uuid "a36cda8e-ef05-5925-93ca-5a55dd5e56ad"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "#FLG1") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "#FLG1") (unit 1))
 ))
   )
   (symbol
@@ -507,7 +507,7 @@
     (pin "1" (uuid "6c656b1a-f529-5f15-a6b6-034f955d95d6"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "#FLG2") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "#FLG2") (unit 1))
 ))
   )
   (symbol
@@ -560,7 +560,7 @@
     (pin "1" (uuid "fa5159e6-3ff7-52b7-a537-1a94b27b7e7f"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "#FLG3") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "#FLG3") (unit 1))
 ))
   )
   (symbol
@@ -584,7 +584,7 @@
     )
     (property
       "Value"
-      "10nF"
+      "22nF"
       (at 78.232 97.79 0)
       (show_name no)
       (do_not_autoplace no)
@@ -612,7 +612,7 @@
     (pin "2" (uuid "07fde1a0-a51c-599b-aee0-911437968b75"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "C1") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "C1") (unit 1))
 ))
   )
   (symbol
@@ -636,7 +636,7 @@
     )
     (property
       "Value"
-      "22nF"
+      "10nF"
       (at 78.232 115.57 0)
       (show_name no)
       (do_not_autoplace no)
@@ -664,7 +664,7 @@
     (pin "2" (uuid "1b98678f-a0cb-53a0-ab3f-3d44ddf3411f"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "C2") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "C2") (unit 1))
 ))
   )
   (symbol
@@ -716,7 +716,7 @@
     (pin "2" (uuid "66b0a935-4b4d-5e03-a964-f4fee59eb331"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "R1") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "R1") (unit 1))
 ))
   )
   (symbol
@@ -768,7 +768,7 @@
     (pin "2" (uuid "09556d7f-b158-52c1-8498-43ce4ddb384e"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "R2") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "R2") (unit 1))
 ))
   )
   (symbol
@@ -823,7 +823,7 @@
     (pin "5" (uuid "9cecf2b2-1857-5e1e-86f5-92f8f72bae52"))
     (instances (project
   "gcode"
-  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "U1") (unit 1))
+  (path "/1b35cfd0-5ba1-5837-b4a7-0e2c0dbaeaf8" (reference "U1") (unit 1))
 ))
   )
   (label

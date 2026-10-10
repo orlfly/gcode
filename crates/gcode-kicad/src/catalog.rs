@@ -140,18 +140,20 @@ fn rc_highpass() -> CircuitEntry {
 }
 
 fn non_inverting_amp() -> CircuitEntry {
-    // Gain = 1 + 91k/10k = 10.1
+    // R1 is the feedback resistor (OUT -> -in) and R2 the one to ground, so the
+    // gain is 1 + R1/R2 = 1 + 91k/10k = 10.1. (Simulation caught an earlier
+    // version where these were swapped, giving 1.11 instead of 10.1.)
     CircuitEntry {
         id: "non-inverting-amp",
         title: "同相放大器",
-        description: "用 LM321 做同相放大器，增益约 10 倍（10k 和 91k 反馈电阻）",
+        description: "用 LM321 做同相放大器，增益约 10 倍（91k 反馈、10k 到地）",
         category: "放大",
-        expectation: "Gain = 1 + 91k/10k = 10.1",
+        expectation: "Gain = 1 + R1/R2 = 1 + 91k/10k = 10.1",
         ir: NetlistIr::new(
             vec![
                 Component::new("U1", "Amplifier_Operational:LM321", "LM321"),
-                Component::new("R1", "Device:R", "10k"),
-                Component::new("R2", "Device:R", "91k"),
+                Component::new("R1", "Device:R", "91k"),
+                Component::new("R2", "Device:R", "10k"),
                 power_flag(FLG1),
                 power_flag(FLG2),
                 power_flag(FLG3),
@@ -197,20 +199,22 @@ fn inverting_amp() -> CircuitEntry {
 }
 
 fn sallen_key_lowpass() -> CircuitEntry {
-    // fc = 1/(2*pi*sqrt(10k*10k*10n*22n)) = 1.07 kHz
+    // Butterworth-ish unity-gain Sallen-Key: Q = sqrt(C1/C2)/2 = sqrt(2.2)/2 ~ 0.74,
+    // so the -3 dB point sits at the natural frequency f0.
+    // f0 = 1/(2*pi*sqrt(R1*R2*C1*C2)) = 1/(2*pi*10k*sqrt(22n*10n)) = 1.07 kHz.
     CircuitEntry {
         id: "sallen-key-lowpass",
         title: "二阶有源低通（Sallen-Key）",
         description: "用 LM321 做 Sallen-Key 二阶低通，截止频率约 1kHz",
         category: "滤波",
-        expectation: "fc ~= 1.07 kHz (R1=R2=10k, C1=10n, C2=22n)",
+        expectation: "f0 = 1.07 kHz (R1=R2=10k, C1=22n, C2=10n), Q ~ 0.74",
         ir: NetlistIr::new(
             vec![
                 Component::new("U1", "Amplifier_Operational:LM321", "LM321"),
                 Component::new("R1", "Device:R", "10k"),
                 Component::new("R2", "Device:R", "10k"),
-                Component::new("C1", "Device:C", "10nF"),
-                Component::new("C2", "Device:C", "22nF"),
+                Component::new("C1", "Device:C", "22nF"),
+                Component::new("C2", "Device:C", "10nF"),
                 power_flag(FLG1),
                 power_flag(FLG2),
                 power_flag(FLG3),
@@ -317,11 +321,13 @@ fn thermistor_divider() -> CircuitEntry {
         title: "热敏电阻分压接口",
         description: "10k 上拉电阻和 NTC 热敏电阻分压，输出接到 ADC 测温度",
         category: "传感器接口",
-        expectation: "V_sense = VCC x R_ntc/(10k + R_ntc)",
+        expectation: "V_sense = VCC x R_ntc/(10k + R_ntc); at nominal 10k -> VCC/2",
         ir: NetlistIr::new(
             vec![
                 Component::new("R1", "Device:R", "10k"),
-                Component::new("TH1", "Device:Thermistor", "NTC_10k"),
+                // Nominal resistance at 25 C; the value must be a number so the
+                // simulator can use it (see gcode-sim's thermistor model note).
+                Component::new("TH1", "Device:Thermistor", "10k"),
                 power_flag(FLG1),
                 power_flag(FLG2),
             ],

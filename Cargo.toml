@@ -1,9 +1,10 @@
 [workspace]
-members = ["crates/gcode-kicad", "crates/gcode-tools", "crates/gcode-agent"]
+members = ["crates/gcode-kicad", "crates/gcode-sim", "crates/gcode-tools", "crates/gcode-agent"]
 resolver = "3"
 
 [workspace.dependencies]
 gcode-kicad = { path = "crates/gcode-kicad" }
+gcode-sim = { path = "crates/gcode-sim" }
 gcode-tools = { path = "crates/gcode-tools" }
 # jcode 本体（上游，只读）。用兄弟目录相对路径，兼容两种布局：
 #   /opt/workspace/{gcode,jcode}  与  ~/workspace/{gcode,jcode}

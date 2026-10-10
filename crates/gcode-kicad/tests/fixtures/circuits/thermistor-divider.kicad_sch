@@ -2,7 +2,7 @@
   (version 20260306)
   (generator "gcode")
   (generator_version "10.0")
-  (uuid "4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb")
+  (uuid "9e83a926-3be2-5c98-80cd-ffae68907a90")
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -336,7 +336,7 @@
     (pin "1" (uuid "a36cda8e-ef05-5925-93ca-5a55dd5e56ad"))
     (instances (project
   "gcode"
-  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "#FLG1") (unit 1))
+  (path "/9e83a926-3be2-5c98-80cd-ffae68907a90" (reference "#FLG1") (unit 1))
 ))
   )
   (symbol
@@ -389,7 +389,7 @@
     (pin "1" (uuid "6c656b1a-f529-5f15-a6b6-034f955d95d6"))
     (instances (project
   "gcode"
-  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "#FLG2") (unit 1))
+  (path "/9e83a926-3be2-5c98-80cd-ffae68907a90" (reference "#FLG2") (unit 1))
 ))
   )
   (symbol
@@ -441,7 +441,7 @@
     (pin "2" (uuid "66b0a935-4b4d-5e03-a964-f4fee59eb331"))
     (instances (project
   "gcode"
-  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "R1") (unit 1))
+  (path "/9e83a926-3be2-5c98-80cd-ffae68907a90" (reference "R1") (unit 1))
 ))
   )
   (symbol
@@ -465,7 +465,7 @@
     )
     (property
       "Value"
-      "NTC_10k"
+      "10k"
       (at 78.105 104.14 0)
       (show_name no)
       (do_not_autoplace no)
@@ -493,7 +493,7 @@
     (pin "2" (uuid "49064080-2d09-5ddd-9319-174b51234af7"))
     (instances (project
   "gcode"
-  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "TH1") (unit 1))
+  (path "/9e83a926-3be2-5c98-80cd-ffae68907a90" (reference "TH1") (unit 1))
 ))
   )
   (label
