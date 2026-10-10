@@ -16,6 +16,9 @@ KiCad GUI 打开文件查看。
 - `gcode_read_schematic` —— 读回已有 `.kicad_sch` 的网表 IR
 - `gcode_apply_edit` —— 修改已有原理图（先看 diff，确认后写回）
 - `gcode_check_toolchain` —— 查看 kicad-cli 是否可用
+- `gcode_list_sim_recipes` —— 查看每个电路可做的仿真（分析类型、探针、解析预期值与容差）
+- `gcode_run_simulation` —— 跑 ngspice 仿真，拿到实测指标、PASS/FAIL 与波形/图形产物路径
+- `gcode_check_sim_toolchain` —— 查看 ngspice 是否可用
 
 **绝对不要**手写或编辑 `.kicad_sch`（s-expression）。所有改动都必须经过网表 IR。
 
@@ -58,6 +61,17 @@ KiCad GUI 打开文件查看。
     （例如 `Amplifier_Operational:LM321`），或把不用的单元按规范接好。
 - ERC 只做电气规则，不做仿真。R0 阶段不承诺增益/带宽等数值。
 
+# 仿真（R1）
+- **数值结论必须来自仿真结果**。增益、截止频率、工作点、上升时间这类数字，必须引用
+  `gcode_run_simulation` 的输出；不要只凭公式或经验就说「已验证」。
+  允许先给出解析估算作为预期值，但结论要注明「仿真实测 = ...」。
+- 流程：`gcode_list_sim_recipes` 看有哪些配方与预期值 → `gcode_run_simulation`（传
+  `circuit_id`，或传 `netlist` + `analysis` 做自定义分析）→ 用返回的 PASS/FAIL 与偏差说话。
+- 仿真结果里 `产物` 是波形 CSV 与 SVG 图（波特图/时域）的路径，请把它们告诉用户，便于复查。
+- **诚实边界**：有源器件用的是**行为级 macromodel**（LM321 运放、Q_NMOS、LED、L7805），
+  验证的是拓扑与量级正确性，**不是**器件级精度。涉及精度时必须说明这一点。
+- ERC 只做电气规则检查，不做数值仿真；两者都要跑才算完整验证。
+
 # 修改已有设计
 用 `gcode_read_schematic` 先读回真实内容，再基于它构造新网表，然后用
 `gcode_apply_edit`（先 `confirm=false` 拿 diff → 展示给用户 → 得到确认后用
@@ -99,9 +113,22 @@ mod tests {
             "gcode_read_schematic",
             "gcode_apply_edit",
             "gcode_check_toolchain",
+            "gcode_list_sim_recipes",
+            "gcode_run_simulation",
+            "gcode_check_sim_toolchain",
         ] {
             assert!(GCODE_SYSTEM_PROMPT.contains(tool), "missing tool {tool}");
         }
+    }
+
+    #[test]
+    fn prompt_requires_simulation_for_numeric_claims() {
+        assert!(GCODE_SYSTEM_PROMPT.contains("数值结论必须来自仿真结果"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("gcode_run_simulation"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("gcode_list_sim_recipes"));
+        // The fidelity caveat must be stated, not hidden.
+        assert!(GCODE_SYSTEM_PROMPT.contains("行为级 macromodel"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("不是**器件级精度") || GCODE_SYSTEM_PROMPT.contains("不是"));
     }
 
     #[test]

@@ -18,6 +18,10 @@ use gcode_kicad::reader::read_netlist_file;
 use gcode_kicad::schematic::{generate_with_report, Layout};
 use gcode_kicad::symbols::SymbolLibrary;
 use gcode_kicad::NetlistIr;
+use gcode_sim::analysis::Expectation;
+use gcode_sim::netlist::Analysis;
+use gcode_sim::recipes;
+use gcode_sim::runner::Ngspice;
 use jcode::tool::{Tool, ToolContext, ToolOutput};
 use serde_json::Value;
 use std::path::Path;
@@ -392,6 +396,331 @@ impl Tool for CheckToolchainTool {
     }
 }
 
+/// Tool: list the simulation recipes available for the catalog.
+pub struct ListSimRecipesTool;
+
+#[async_trait]
+impl Tool for ListSimRecipesTool {
+    fn name(&self) -> &str {
+        "gcode_list_sim_recipes"
+    }
+
+    fn description(&self) -> &str {
+        "List the simulation recipes (analysis type, probes, analytically derived expectations and \
+         tolerances) available for the circuit catalog. Use this before running a simulation so you \
+         know what can be measured and what the expected values are."
+    }
+
+    fn parameters_schema(&self) -> Value {
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "circuit_id": {"type": "string", "description": "Optional: only show recipes for this circuit"}
+            }
+        })
+    }
+
+    async fn execute(&self, input: Value, _ctx: ToolContext) -> anyhow::Result<ToolOutput> {
+        let filter = input.get("circuit_id").and_then(|v| v.as_str());
+        let recipes: Vec<recipes::SimRecipe> = match filter {
+            Some(id) => recipes::by_circuit(id),
+            None => recipes::all(),
+        };
+        if recipes.is_empty() {
+            return Ok(ToolOutput::new(format!(
+                "没有电路 {filter:?} 的仿真配方。可仿真的电路：{}",
+                recipes::covered_circuits().join(", ")
+            )));
+        }
+        let mut out = format!("共 {} 个仿真配方：\n", recipes.len());
+        for r in &recipes {
+            out.push_str(&format!(
+                "\n- {} / {}（{}）\n  测量节点：{}\n  依据：{}",
+                r.circuit_id,
+                r.name,
+                r.analysis.kind.tag(),
+                r.output,
+                r.basis
+            ));
+            for e in &r.expectations {
+                out.push_str(&format!(
+                    "\n  · {} 预期 {} {}（±{}%）：{}",
+                    e.metric, e.expected, e.unit, e.tol_pct, e.rationale
+                ));
+            }
+        }
+        Ok(ToolOutput::new(out))
+    }
+}
+
+/// Tool: run a simulation and report the verdict.
+pub struct RunSimulationTool;
+
+#[async_trait]
+impl Tool for RunSimulationTool {
+    fn name(&self) -> &str {
+        "gcode_run_simulation"
+    }
+
+    fn description(&self) -> &str {
+        "Run a SPICE simulation with ngspice and return measured metrics compared against \
+         expectations, plus the paths of the waveform CSV and SVG plot. Either pass a circuit_id to \
+         use a catalog recipe, or pass netlist (IR JSON) together with an explicit analysis. Active \
+         devices use behavioural macromodels, so results verify topology and magnitude, not \
+         device-level precision."
+    }
+
+    fn parameters_schema(&self) -> Value {
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "circuit_id": {"type": "string", "description": "Catalog circuit to simulate using its recipe"},
+                "recipe": {"type": "string", "description": "Recipe name when a circuit has several (e.g. 'on state')"},
+                "netlist": {"type": "object", "description": "Netlist IR to simulate when circuit_id is omitted"},
+                "analysis": {"type": "object", "description": "Analysis config when netlist is given: {kind, points, start_hz, stop_hz, step_s, stop_s, stimuli, probes}"},
+                "expectations": {"type": "array", "description": "Optional [{metric, expected, tol_pct, unit, rationale}] to judge against"},
+                "out_dir": {"type": "string", "description": "Directory for artifacts (defaults to a temp dir)"}
+            }
+        })
+    }
+
+    async fn execute(&self, input: Value, ctx: ToolContext) -> anyhow::Result<ToolOutput> {
+        simulate(input, ctx, None).await
+    }
+}
+
+/// Tool: report whether simulation is available.
+pub struct CheckSimToolchainTool;
+
+#[async_trait]
+impl Tool for CheckSimToolchainTool {
+    fn name(&self) -> &str {
+        "gcode_check_sim_toolchain"
+    }
+
+    fn description(&self) -> &str {
+        "Report whether ngspice is available for simulation, its version, and which device models \
+         the simulator knows. Schematic generation and ERC do not depend on this."
+    }
+
+    fn parameters_schema(&self) -> Value {
+        serde_json::json!({"type": "object", "properties": {}})
+    }
+
+    async fn execute(&self, _input: Value, _ctx: ToolContext) -> anyhow::Result<ToolOutput> {
+        let mut out = format!(
+            "可仿真的器件模型：{}\n",
+            gcode_sim::models::supported_lib_ids().join(", ")
+        );
+        match Ngspice::probe().await {
+            Ok(n) => out.push_str(&format!(
+                "ngspice：{}（{}），仿真可用。\n",
+                n.version,
+                n.path.display()
+            )),
+            Err(e) => out.push_str(&format!(
+                "ngspice：不可用 —— {e}\n仿真工具会给出提示；生成与 ERC 不受影响。\n"
+            )),
+        }
+        Ok(ToolOutput::new(out))
+    }
+}
+
+/// Shared implementation for the simulation tool.
+///
+/// `ngspice_path` exists so tests can inject a bad binary without mutating
+/// process-global environment state.
+async fn simulate(
+    input: Value,
+    ctx: ToolContext,
+    ngspice_path: Option<&str>,
+) -> anyhow::Result<ToolOutput> {
+    let ngspice = match ngspice_path {
+        Some(p) => match Ngspice::probe_at(Path::new(p)).await {
+            Ok(n) => n,
+            Err(e) => {
+                return Ok(ToolOutput::new(format!(
+                    "无法仿真：{e}\n（原理图生成与 ERC 仍可正常使用。）"
+                )))
+            }
+        },
+        None => match Ngspice::probe().await {
+            Ok(n) => n,
+            Err(e) => {
+                return Ok(ToolOutput::new(format!(
+                    "无法仿真：{e}\n（原理图生成与 ERC 仍可正常使用。）"
+                )))
+            }
+        },
+    };
+
+    let out_dir = input
+        .get("out_dir")
+        .and_then(|v| v.as_str())
+        .map(|s| ctx.resolve_path(Path::new(s)))
+        .unwrap_or_else(|| std::env::temp_dir().join("gcode-sim-runs"));
+
+    // Path A: a catalog recipe.
+    if let Some(id) = input.get("circuit_id").and_then(|v| v.as_str()) {
+        let Some(entry) = gcode_kicad::catalog::by_id(id) else {
+            return Ok(ToolOutput::new(format!(
+                "未知电路 {id:?}。可仿真的电路：{}",
+                recipes::covered_circuits().join(", ")
+            )));
+        };
+        let mut candidates = recipes::by_circuit(id);
+        if let Some(name) = input.get("recipe").and_then(|v| v.as_str()) {
+            candidates.retain(|r| r.name == name);
+        }
+        if candidates.is_empty() {
+            return Ok(ToolOutput::new(format!(
+                "电路 {id} 没有匹配的仿真配方。可用配方：{}",
+                recipes::by_circuit(id)
+                    .iter()
+                    .map(|r| r.name)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )));
+        }
+        let mut sections = Vec::new();
+        for recipe in candidates {
+            let dir = out_dir.join(format!(
+                "{}.{}",
+                recipe.circuit_id,
+                recipe.name.replace(' ', "_")
+            ));
+            match recipes::run_recipe(&ngspice, &recipe, &entry.ir, &dir, true).await {
+                Ok(o) => sections.push(render_outcome(&o, &recipe)),
+                Err(e) => sections.push(format!("{} [{}] 运行失败：{e}", id, recipe.name)),
+            }
+        }
+        return Ok(ToolOutput::new(sections.join("\n\n")));
+    }
+
+    // Path B: an explicit netlist + analysis.
+    let Some(netlist) = input.get("netlist") else {
+        return Ok(ToolOutput::new(
+            "需要 circuit_id 或 netlist 之一。用 gcode_list_sim_recipes 查看可用的仿真配方。"
+                .to_string(),
+        ));
+    };
+    let ir: NetlistIr = serde_json::from_value(netlist.clone())
+        .map_err(|e| anyhow::anyhow!("netlist JSON invalid: {e}"))?;
+    let Some(analysis_value) = input.get("analysis") else {
+        return Ok(ToolOutput::new(
+            "提供 netlist 时必须同时提供 analysis（分析类型、激励与探针）。".to_string(),
+        ));
+    };
+    let analysis: Analysis = serde_json::from_value(analysis_value.clone())
+        .map_err(|e| anyhow::anyhow!("analysis JSON invalid: {e}"))?;
+    let expectations: Vec<Expectation> = match input.get("expectations") {
+        Some(v) => serde_json::from_value(v.clone())
+            .map_err(|e| anyhow::anyhow!("expectations JSON invalid: {e}"))?,
+        None => Vec::new(),
+    };
+
+    let tag = analysis.kind.tag();
+    let opts = gcode_sim::netlist::DeckOptions::new("gcode simulation", "waveform.dat");
+    let deck = match gcode_sim::netlist::generate(&ir, &analysis, &opts) {
+        Ok(d) => d,
+        Err(e) => return Ok(ToolOutput::new(format!("无法生成仿真网表：{e}"))),
+    };
+    let dir = out_dir.join(format!("adhoc.{tag}"));
+    let waveform = match ngspice.run(&dir, &deck.text, "waveform.dat").await {
+        Ok(w) => w,
+        Err(e) => return Ok(ToolOutput::new(format!("仿真失败：{e}"))),
+    };
+
+    let column = |net: &str| -> String {
+        let node = deck
+            .node_map
+            .get(net)
+            .cloned()
+            .unwrap_or_else(|| gcode_sim::netlist::normalize_node(net));
+        match analysis.kind {
+            gcode_sim::AnalysisKind::Ac { .. } => format!("vm({node})"),
+            _ => format!("v({node})"),
+        }
+    };
+    let probe_net = analysis.probes.first().cloned().unwrap_or_default();
+    let out_col = column(&probe_net);
+    let in_col = analysis
+        .stimuli
+        .first()
+        .map(|s| column(s.net()))
+        .unwrap_or_else(|| out_col.clone());
+
+    let metric_set = match analysis.kind {
+        gcode_sim::AnalysisKind::Op => gcode_sim::MetricSet::Dc,
+        gcode_sim::AnalysisKind::Ac { .. } => gcode_sim::MetricSet::Ac {
+            shape: gcode_sim::ResponseShape::Lowpass,
+        },
+        gcode_sim::AnalysisKind::Tran { .. } => gcode_sim::MetricSet::Tran,
+    };
+    let measured = gcode_sim::extract_metrics(metric_set, &waveform, &out_col, &in_col);
+
+    let mut out = format!("仿真完成（{}，探针 {}）。\n实测指标：\n", tag, probe_net);
+    for (k, v) in &measured {
+        out.push_str(&format!("- {k} = {v}\n"));
+    }
+    if !expectations.is_empty() {
+        let verdict = gcode_sim::evaluate(&measured, &expectations);
+        out.push_str(&format!("\n{}", verdict.render()));
+    } else {
+        out.push_str("\n（未提供预期值，因此不做 PASS/FAIL 判定。）\n");
+    }
+
+    // Artifacts.
+    let (csv_name, svg_name) = gcode_sim::artifact_names("adhoc", tag);
+    let art_dir = dir.join("artifacts");
+    if gcode_sim::artifacts::write_waveform_csv(&art_dir.join(&csv_name), &waveform).is_ok() {
+        out.push_str(&format!("\n波形数据：{}\n", art_dir.join(&csv_name).display()));
+    }
+    let svg = match analysis.kind {
+        gcode_sim::AnalysisKind::Ac { .. } => {
+            gcode_sim::bode_svg(&waveform, &out_col, &in_col, "gcode simulation")
+        }
+        _ => gcode_sim::series_svg(&waveform, &out_col, "gcode simulation", false),
+    };
+    if let Some(svg) = svg {
+        let p = art_dir.join(&svg_name);
+        if std::fs::create_dir_all(&art_dir).is_ok() && std::fs::write(&p, svg).is_ok() {
+            out.push_str(&format!("图形：{}\n", p.display()));
+        }
+    }
+    if !deck.behavioral_devices.is_empty() {
+        out.push_str("\n本次使用行为级模型：\n");
+        for d in &deck.behavioral_devices {
+            out.push_str(&format!("- {d}\n"));
+        }
+    }
+    Ok(ToolOutput::new(out))
+}
+
+fn render_outcome(o: &recipes::SimOutcome, recipe: &recipes::SimRecipe) -> String {
+    let mut out = format!(
+        "电路 {} / {}（{}）\n{}\n依据：{}",
+        o.circuit_id,
+        o.recipe,
+        o.analysis_tag,
+        o.verdict.render(),
+        recipe.basis
+    );
+    if !o.artifacts.is_empty() {
+        out.push_str("\n产物：");
+        for p in &o.artifacts {
+            out.push_str(&format!("\n- {}", p.display()));
+        }
+    }
+    if !o.behavioral_devices.is_empty() {
+        out.push_str("\n行为级模型：");
+        for d in &o.behavioral_devices {
+            out.push_str(&format!("\n- {d}"));
+        }
+    }
+    out
+}
+
 /// All Gcode tools, for registration with the jcode tool registry.
 pub fn all_tools() -> Vec<Box<dyn Tool>> {
     vec![
@@ -401,6 +730,9 @@ pub fn all_tools() -> Vec<Box<dyn Tool>> {
         Box::new(ApplyEditTool),
         Box::new(SearchSymbolsTool),
         Box::new(CheckToolchainTool),
+        Box::new(ListSimRecipesTool),
+        Box::new(RunSimulationTool),
+        Box::new(CheckSimToolchainTool),
     ]
 }
 
@@ -435,7 +767,7 @@ mod tests {
     fn registers_all_tools_with_unique_names() {
         let tools = all_tools();
         let names: Vec<&str> = tools.iter().map(|t| t.name()).collect();
-        assert_eq!(names.len(), 6);
+        assert_eq!(names.len(), 9);
         let mut sorted = names.clone();
         sorted.sort();
         sorted.dedup();
@@ -443,6 +775,127 @@ mod tests {
         assert!(names.contains(&"gcode_generate_schematic"));
         assert!(names.contains(&"gcode_run_erc"));
         assert!(names.contains(&"gcode_apply_edit"));
+        assert!(names.contains(&"gcode_run_simulation"));
+        assert!(names.contains(&"gcode_list_sim_recipes"));
+        assert!(names.contains(&"gcode_check_sim_toolchain"));
+    }
+
+    #[tokio::test]
+    async fn lists_sim_recipes_for_every_circuit() {
+        let all = ListSimRecipesTool
+            .execute(serde_json::json!({}), ctx())
+            .await
+            .unwrap();
+        assert!(all.output.contains("mosfet-switch"));
+        assert!(all.output.contains("依据"), "{}", all.output);
+
+        let one = ListSimRecipesTool
+            .execute(serde_json::json!({"circuit_id": "rc-lowpass"}), ctx())
+            .await
+            .unwrap();
+        assert!(one.output.contains("fc_3db"));
+        assert!(!one.output.contains("mosfet-switch"));
+
+        let none = ListSimRecipesTool
+            .execute(serde_json::json!({"circuit_id": "nope"}), ctx())
+            .await
+            .unwrap();
+        assert!(none.output.contains("没有电路"));
+    }
+
+    #[tokio::test]
+    async fn simulation_reports_missing_ngspice_clearly() {
+        // Inject a non-existent binary instead of mutating the environment.
+        let out = simulate(
+            serde_json::json!({"circuit_id": "voltage-divider"}),
+            ctx(),
+            Some("/nonexistent/ngspice"),
+        )
+        .await
+        .unwrap();
+        assert!(out.output.contains("无法仿真"), "{}", out.output);
+        assert!(out.output.contains("ERC"), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn simulation_requires_an_input() {
+        let out = simulate(serde_json::json!({}), ctx(), None).await.unwrap();
+        assert!(
+            out.output.contains("circuit_id") || out.output.contains("无法仿真"),
+            "{}",
+            out.output
+        );
+    }
+
+    #[tokio::test]
+    async fn simulation_rejects_an_unknown_circuit() {
+        let out = simulate(
+            serde_json::json!({"circuit_id": "does-not-exist"}),
+            ctx(),
+            None,
+        )
+        .await
+        .unwrap();
+        assert!(
+            out.output.contains("未知电路") || out.output.contains("无法仿真"),
+            "{}",
+            out.output
+        );
+    }
+
+    #[tokio::test]
+    async fn adhoc_simulation_needs_an_analysis() {
+        let ir = catalog::by_id("voltage-divider").unwrap().ir;
+        let out = simulate(
+            serde_json::json!({"netlist": serde_json::to_value(&ir).unwrap()}),
+            ctx(),
+            None,
+        )
+        .await
+        .unwrap();
+        assert!(
+            out.output.contains("analysis") || out.output.contains("无法仿真"),
+            "{}",
+            out.output
+        );
+    }
+
+    #[tokio::test]
+    async fn sim_toolchain_report_names_models() {
+        let out = CheckSimToolchainTool
+            .execute(serde_json::json!({}), ctx())
+            .await
+            .unwrap();
+        assert!(
+            out.output.contains("Amplifier_Operational:LM321"),
+            "{}",
+            out.output
+        );
+        assert!(out.output.contains("ngspice"), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn run_simulation_produces_a_verdict_and_artifacts() {
+        // Skips silently when ngspice is not installed.
+        if Ngspice::probe().await.is_err() {
+            eprintln!("skip: ngspice not available");
+            return;
+        }
+        let dir = tmp("simrun");
+        let out = RunSimulationTool
+            .execute(
+                serde_json::json!({
+                    "circuit_id": "voltage-divider",
+                    "out_dir": dir.to_str().unwrap()
+                }),
+                ctx(),
+            )
+            .await
+            .unwrap();
+        assert!(out.output.contains("PASS"), "{}", out.output);
+        assert!(out.output.contains("产物"), "{}", out.output);
+        assert!(out.output.contains(".svg"), "{}", out.output);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[tokio::test]

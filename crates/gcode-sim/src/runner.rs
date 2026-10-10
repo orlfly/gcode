@@ -66,7 +66,19 @@ impl Ngspice {
         let path = std::env::var_os(NGSPICE_ENV)
             .map(PathBuf::from)
             .unwrap_or_else(|| PathBuf::from("ngspice"));
-        let output = Command::new(&path)
+        Self::probe_at_with(&path, min_major).await
+    }
+
+    /// Probe an explicit binary path (no environment lookup).
+    ///
+    /// Used by tests and by callers that resolve the binary themselves, so they
+    /// never have to mutate process-global environment state.
+    pub async fn probe_at(path: &Path) -> Result<Self, RunnerError> {
+        Self::probe_at_with(path, MIN_MAJOR_VERSION).await
+    }
+
+    async fn probe_at_with(path: &Path, min_major: u32) -> Result<Self, RunnerError> {
+        let output = Command::new(path)
             .arg("--version")
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
@@ -88,7 +100,7 @@ impl Ngspice {
             });
         }
         Ok(Self {
-            path,
+            path: path.to_path_buf(),
             version: format!("ngspice-{major}"),
             major,
         })
@@ -362,12 +374,11 @@ mod tests {
 
     #[tokio::test]
     async fn probe_reports_missing_binary_clearly() {
-        // Point at a path that cannot exist.
-        // SAFETY: this test is the only one mutating the variable.
-        unsafe { std::env::set_var(NGSPICE_ENV, "/nonexistent/ngspice-binary") };
-        let err = Ngspice::probe().await.unwrap_err();
+        // No environment mutation: probe an explicit bogus path.
+        let err = Ngspice::probe_at(Path::new("/nonexistent/ngspice-binary"))
+            .await
+            .unwrap_err();
         assert!(matches!(err, RunnerError::NotFound));
         assert!(err.to_string().contains(NGSPICE_ENV));
-        unsafe { std::env::remove_var(NGSPICE_ENV) };
     }
 }

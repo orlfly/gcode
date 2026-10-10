@@ -252,6 +252,22 @@ pub fn normalize_node(net: &str) -> String {
     s
 }
 
+/// SPICE device name for a component.
+///
+/// KiCad references already carry the device letter (`R1`, `C2`), so prefixing
+/// again would produce `RR1`. Only add the letter when it is missing.
+fn device_name(prefix: &str, reference: &str) -> String {
+    if reference
+        .chars()
+        .next()
+        .is_some_and(|c| c.eq_ignore_ascii_case(&prefix.chars().next().unwrap_or(' ')))
+    {
+        reference.to_string()
+    } else {
+        format!("{prefix}{reference}")
+    }
+}
+
 /// KiCad-friendly number formatting shared with the rest of Gcode.
 fn fmt(v: f64) -> String {
     let mut s = format!("{v:.9}");
@@ -355,13 +371,15 @@ pub fn generate(
         }
 
         let card = match model.kind {
-            CardKind::Passive => {
-                format!("{}{} {} {}", model.prefix, c.reference, ports.join(" "), c.value)
-            }
+            CardKind::Passive => format!(
+                "{} {} {}",
+                device_name(model.prefix, &c.reference),
+                ports.join(" "),
+                c.value
+            ),
             CardKind::Diode => format!(
-                "{}{} {} {}",
-                model.prefix,
-                c.reference,
+                "{} {} {}",
+                device_name(model.prefix, &c.reference),
                 ports.join(" "),
                 model.model_name.unwrap_or_default()
             ),
@@ -370,9 +388,8 @@ pub fn generate(
                 // (three-terminal usage), which is what the schematic expresses.
                 let bulk = ports.get(2).cloned().unwrap_or_else(|| "0".into());
                 format!(
-                    "{}{} {} {} {}",
-                    model.prefix,
-                    c.reference,
+                    "{} {} {} {}",
+                    device_name(model.prefix, &c.reference),
                     ports.join(" "),
                     bulk,
                     model.model_name.unwrap_or_default()
@@ -385,7 +402,12 @@ pub fn generate(
                         injected_subckts.push(body.to_string());
                     }
                 }
-                format!("X{} {} {}", c.reference, ports.join(" "), name)
+                format!(
+                    "{} {} {}",
+                    device_name(model.prefix, &c.reference),
+                    ports.join(" "),
+                    name
+                )
             }
         };
         cards.push(card);
@@ -531,6 +553,17 @@ mod tests {
     }
 
     #[test]
+    fn device_names_do_not_double_the_letter() {
+        // KiCad references already carry the device letter.
+        assert_eq!(device_name("R", "R1"), "R1");
+        assert_eq!(device_name("C", "C2"), "C2");
+        assert_eq!(device_name("D", "D1"), "D1");
+        // Subcircuits need the X prefix; MOSFETs referenced as Q1 need M.
+        assert_eq!(device_name("X", "U1"), "XU1");
+        assert_eq!(device_name("M", "Q1"), "MQ1");
+    }
+
+    #[test]
     fn ground_is_node_zero() {
         assert_eq!(normalize_node("GND"), "0");
         assert_eq!(normalize_node("gnd"), "0");
@@ -581,8 +614,12 @@ mod tests {
             &["VOUT"],
         );
         let deck = generate(&ir, &analysis, &opts()).unwrap();
-        assert!(deck.text.contains("RR1 0 VOUT 39k") || deck.text.contains("RR1 VIN VOUT 39k"));
-        assert!(deck.text.contains("RR2 VOUT 0 10k"));
+        assert!(
+            deck.text.contains("R1 VIN VOUT 39k"),
+            "{}",
+            deck.text
+        );
+        assert!(deck.text.contains("R2 VOUT 0 10k"));
         assert!(deck.text.contains("V_VIN VIN 0 DC 12"));
         assert!(deck.text.contains(".op"));
         // power flags are not simulated
@@ -665,7 +702,8 @@ mod tests {
         );
         let deck = generate(&ir, &analysis, &opts()).unwrap();
         assert!(
-            deck.text.contains("MQ1 DRAIN GATE 0 0 QNMOD_GCODE"),
+            deck.text.contains("MQ1 DRAIN GATE 0 0 QNMOD_GCODE")
+                || deck.text.contains("Q1 DRAIN GATE 0 0 QNMOD_GCODE"),
             "{}",
             deck.text
         );

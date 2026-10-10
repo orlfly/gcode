@@ -102,16 +102,15 @@ async fn report_toolchain() {
         .dir()
         .map(|p| p.display().to_string())
         .unwrap_or_else(|| "未找到".into());
-    match gcode_kicad::erc::KicadToolchain::probe().await {
-        Ok(tc) => eprintln!(
-            "gcode: kicad-cli {} ({}) · 符号库 {symbols}",
-            tc.version,
-            tc.path.display()
-        ),
-        Err(e) => eprintln!(
-            "gcode: {e}\n  → 仍可生成原理图；需要 ERC 时请安装/升级 KiCad。符号库 {symbols}"
-        ),
-    }
+    let kicad = match gcode_kicad::erc::KicadToolchain::probe().await {
+        Ok(tc) => format!("kicad-cli {} ({})", tc.version, tc.path.display()),
+        Err(_) => "kicad-cli 不可用（生成可用，ERC 不可用）".to_string(),
+    };
+    let ngspice = match gcode_sim::runner::Ngspice::probe().await {
+        Ok(n) => format!("{} ({})", n.version, n.path.display()),
+        Err(_) => "ngspice 不可用（生成/ERC 可用，仿真不可用）".to_string(),
+    };
+    eprintln!("gcode: {kicad} · {ngspice} · 符号库 {symbols}");
 }
 
 #[cfg(test)]
