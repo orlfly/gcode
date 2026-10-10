@@ -110,10 +110,9 @@ pub fn read_netlist(text: &str) -> Result<NetlistIr, ReadError> {
                 // Same transform as the writer: library Y is up, sheet Y is down.
                 let key = coord_key(sym_x + p.x, sym_y - p.y);
                 if let Some(net) = label_at.get(&key) {
-                    // Power symbols (#FLG, #PWR...) are ERC annotations, not parts.
-                    if reference.starts_with('#') {
-                        continue;
-                    }
+                    // Power annotations (#FLG, #PWR...) are recovered too: the
+                    // reader must report what the file contains, so that an edit
+                    // staged against it round-trips exactly.
                     net_conns
                         .entry(net.clone())
                         .or_default()
@@ -173,15 +172,9 @@ mod tests {
             got_refs.sort();
             assert_eq!(got_refs, want_refs, "{}: components differ", entry.id);
 
-            // Power-flag symbols carry no netlist nodes, so their nets read
-            // back with fewer connections; every other net must match exactly.
+            // The read must reproduce the IR exactly, power annotations included.
             for want in &entry.ir.nets {
-                let expected: Vec<(String, String)> = want
-                    .connections
-                    .iter()
-                    .filter(|(r, _)| !r.starts_with('#'))
-                    .cloned()
-                    .collect();
+                let expected: Vec<(String, String)> = want.connections.clone();
                 let got = read
                     .nets
                     .iter()

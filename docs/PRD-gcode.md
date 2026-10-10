@@ -216,3 +216,56 @@ trait Instrument {
   2. s-expression 解析选型：自研 vs `kiutils`/`kicad-python`，用 20 个开源 KiCad 项目实测覆盖率
   3. ngspice headless 驱动：从网表跑 DC/AC/瞬态并取回波形数据
   4. NL→网表中间表示的 schema 设计（先于任何 UI/CLI 工作）
+
+---
+
+## 附二：R0 实施记录（2026-10-10 更新）
+
+> 本节由 R0 实施回填。任务分解见 `openspec/changes/r0-design-mvp/`；
+> 验收数据见 `openspec/changes/r0-design-mvp/kr1-report.md`。
+
+### 环境现状（与上方基线不同）
+
+- 本机为 Ubuntu 24.04.5 LTS，**已安装 KiCad 7.0.11（含 `/usr/bin/kicad-cli`）**，
+  另有 222 个符号库与 48 个官方 demo 工程可直接用作测试语料。
+- **KiCad 7 的 `kicad-cli` 没有 `sch erc` 子命令**（ERC 由 KiCad 8 引入，PRD 目标是 KiCad 10）。
+  因此 ERC 轨道目前**无法在本机测量**。已实现版本门控：默认要求 ≥ 10.0.0，
+  可用 `GCODE_KICAD_MIN_VERSION` 覆盖（例如临时用较低版本验证流水线）。
+- ngspice 仍未安装（属 R1 范围）。
+
+### 待验证项结论
+
+1. **`kicad-cli` headless 导出 + ERC**
+   - 网表导出：✅ 已验证。10 类电路的生成物全部被 `kicad-cli sch export netlist` 成功读取，
+     且导出的网络节点与网表 IR **逐条一致**（10/10）。
+   - ERC：⛔ 本机不可用（KiCad 7）。门控与解读层已实现并有测试覆盖；待装 KiCad ≥ 10 后重跑。
+2. **s-expression 解析选型**
+   - 决定：**自研解析器**（零依赖、可控、无需 Python 桥）。
+   - 实测覆盖率：**309/309 个真实 KiCad 文件解析成功（100%）**，共 190 MiB，
+     包含 `demos/`、`symbols/`、`footprints/`。测试见
+     `crates/gcode-kicad/tests/parser_coverage.rs`（原计划 20 个工程，实测样本更大）。
+3. **ngspice headless 驱动**：R1 事项，未执行。
+4. **NL→网表 schema**：✅ 已定型为 `NetlistIr`（components/nets JSON）。
+   - 生成前强制结构校验（重复位号、未知组件、空网络、空引脚、空 lib_id、网络重名、
+     跨网络短路等 9 类错误），校验失败不落盘。
+   - 输出确定性：等价 IR（任意输入顺序）生成字节级一致的文件。
+   - 已内置 10 类典型电路目录（KR1 的基础）。
+
+### R0 当前状态
+
+| 能力 | 状态 |
+|---|---|
+| NL→网表 IR 契约 + 校验 | ✅ 完成 |
+| 确定性 `.kicad_sch` 生成（嵌入真实符号库定义） | ✅ 完成 |
+| 引脚级真实连接（KiCad 网表可复现） | ✅ 完成 |
+| ERC 运行 + 中文解读 + 修复建议 + 自查循环 | ⚠️ 代码完成，本机无法实测 |
+| 电路目录（10 类）+ 离线回归 + KiCad 集成验证 | ✅ 完成 |
+| 对话式 diff 修改（确认后写回、可回退） | ✅ 完成 |
+| Agent 运行时（隔离 home、6 个工具、提示词契约） | ✅ 完成 |
+| **KR1 判定（ERC ≥ 7/10）** | ⏸ 阻塞于 KiCad ≥ 10 |
+
+### 后续阻塞项
+
+1. 安装 KiCad ≥ 10（需要 sudo 或 flatpak），随后重跑 `kr1_acceptance` 得到真正的 KR1 结论。
+2. 配置 provider 后，用 agent 会话跑 10 条自然语言描述，测量真正的 NL→网表 成功率。
+3. R1（仿真）需安装 ngspice 并新增 `gcode-sim` crate。

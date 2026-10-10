@@ -91,6 +91,11 @@ impl NetlistIr {
         self.components.iter().find(|c| c.reference == reference)
     }
 
+    /// Set of reference designators, for quick membership checks.
+    pub fn reference_set(&self) -> BTreeSet<String> {
+        self.components.iter().map(|c| c.reference.clone()).collect()
+    }
+
     /// Validate structural consistency before generation.
     ///
     /// This is the hard gate in front of every file write: an IR that fails

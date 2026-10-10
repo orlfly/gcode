@@ -72,7 +72,11 @@ async fn main() -> Result<()> {
         registry.register(name, Arc::from(tool)).await;
     }
 
-    // 3) Terminal + TUI app (full jcode agent loop: streaming, tool exec,
+    // 3) Best-effort toolchain report: never blocks startup, and a missing or
+    //    too-old kicad-cli only disables ERC, not schematic generation.
+    report_toolchain().await;
+
+    // 4) Terminal + TUI app (full jcode agent loop: streaming, tool exec,
     //    permissions, compaction, slash commands).
     let (terminal, tui_runtime) = jcode::cli::terminal::init_tui_runtime()?;
     let mut app = jcode::tui::App::new(provider, registry);
@@ -90,4 +94,77 @@ async fn main() -> Result<()> {
     tui_runtime.finish(true);
     eprintln!("gcode: isolated home at {}", home.display());
     result.map(|_| ())
+}
+
+/// Print a one-line toolchain status to stderr. Best effort: silence is fine.
+async fn report_toolchain() {
+    let symbols = gcode_kicad::SymbolLibrary::locate()
+        .dir()
+        .map(|p| p.display().to_string())
+        .unwrap_or_else(|| "未找到".into());
+    match gcode_kicad::erc::KicadToolchain::probe().await {
+        Ok(tc) => eprintln!(
+            "gcode: kicad-cli {} ({}) · 符号库 {symbols}",
+            tc.version,
+            tc.path.display()
+        ),
+        Err(e) => eprintln!(
+            "gcode: {e}\n  → 仍可生成原理图；需要 ERC 时请安装/升级 KiCad。符号库 {symbols}"
+        ),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The whole runtime must be redirectable, and must never point at jcode's
+    /// own user data. One test on purpose: env vars are process-global, so
+    /// mutating them from several tests would race.
+    #[test]
+    fn isolated_home_redirects_everything_and_never_targets_jcode() {
+        let dir = std::env::temp_dir().join(format!("gcode-home-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+
+        // 1) Default (no override) is ~/.gcode, and must not sit under jcode's
+        //    own data directory.
+        let jcode_home = std::env::var("HOME")
+            .map(std::path::PathBuf::from)
+            .unwrap_or_default()
+            .join(".jcode");
+        unsafe { std::env::remove_var("GCODE_HOME") };
+        let default = gcode_home();
+        assert_eq!(default.file_name().and_then(|s| s.to_str()), Some(".gcode"));
+        assert!(
+            !default.starts_with(&jcode_home),
+            "default gcode home must not be inside {}",
+            jcode_home.display()
+        );
+
+        // 2) An explicit override wins.
+        // SAFETY: this test owns the env for the duration of the binary's tests.
+        unsafe {
+            std::env::set_var("GCODE_HOME", &dir);
+            std::env::remove_var("JCODE_HOME");
+            std::env::remove_var("JCODE_RUNTIME_DIR");
+        }
+
+        assert_eq!(gcode_home(), dir, "GCODE_HOME override must be honoured");
+        let home = install_isolated_env().expect("install env");
+        assert_eq!(home, dir);
+
+        for sub in ["logs", "sessions", "skills", "runtime", "tmp"] {
+            assert!(dir.join(sub).is_dir(), "missing {sub}");
+        }
+
+        let expect = |key: &str, want: &std::path::Path| {
+            let got = std::env::var(key).unwrap_or_default();
+            assert_eq!(got, want.display().to_string(), "{key} not redirected");
+        };
+        expect("JCODE_HOME", &dir);
+        expect("JCODE_RUNTIME_DIR", &dir.join("runtime"));
+        expect("TMPDIR", &dir.join("tmp"));
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
