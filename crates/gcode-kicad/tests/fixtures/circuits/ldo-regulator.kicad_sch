@@ -1,7 +1,7 @@
 (kicad_sch
   (version 20230121)
   (generator gcode)
-  (uuid 7a33582f-693b-53be-b5cc-63b5a159428d)
+  (uuid 45a19d40-0518-514f-9147-75063d0a5bf2)
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -222,8 +222,84 @@
     )
   )
   (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 53.34 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid acc9671a-e354-59fd-8863-980b45e20117)
+    (property
+      "Reference"
+      "#FLG1"
+      (at 77.216 53.34 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 58.42 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 60.96 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 63.5 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid a36cda8e-ef05-5925-93ca-5a55dd5e56ad))
+    (instances (project
+  "gcode"
+  (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "#FLG1") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 66.04 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 6de89d92-455e-5a45-a156-653292ba1388)
+    (property
+      "Reference"
+      "#FLG2"
+      (at 77.216 66.04 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 71.12 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 73.66 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 76.2 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 6c656b1a-f529-5f15-a6b6-034f955d95d6))
+    (instances (project
+  "gcode"
+  (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "#FLG2") (unit 1))
+))
+  )
+  (symbol
     (lib_id "Device:C")
-    (at 78.232 54.61 0)
+    (at 78.232 80.01 0)
     (unit 1)
     (in_bom yes)
     (on_board yes)
@@ -232,37 +308,37 @@
     (property
       "Reference"
       "C1"
-      (at 78.232 54.61 0)
+      (at 78.232 80.01 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "100nF"
-      (at 78.232 59.69 0)
+      (at 78.232 85.09 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
-      (at 78.232 62.23 0)
+      (at 78.232 87.63 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property
       "Datasheet"
       ""
-      (at 78.232 64.77 0)
+      (at 78.232 90.17 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 9b01787e-0ed8-5dfd-a022-448536e9cfab))
     (pin "2" (uuid 07fde1a0-a51c-599b-aee0-911437968b75))
     (instances (project
   "gcode"
-  (path "/7a33582f-693b-53be-b5cc-63b5a159428d" (reference "C1") (unit 1))
+  (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "C1") (unit 1))
 ))
   )
   (symbol
     (lib_id "Device:C")
-    (at 78.232 72.39 0)
+    (at 78.232 97.79 0)
     (unit 1)
     (in_bom yes)
     (on_board yes)
@@ -271,108 +347,32 @@
     (property
       "Reference"
       "C2"
-      (at 78.232 72.39 0)
+      (at 78.232 97.79 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "100nF"
-      (at 78.232 77.47 0)
+      (at 78.232 102.87 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
-      (at 78.232 80.01 0)
+      (at 78.232 105.41 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property
       "Datasheet"
       ""
-      (at 78.232 82.55 0)
+      (at 78.232 107.95 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid b3f526f7-5a3a-577c-a66c-c4709dc1be4a))
     (pin "2" (uuid 1b98678f-a0cb-53a0-ab3f-3d44ddf3411f))
     (instances (project
   "gcode"
-  (path "/7a33582f-693b-53be-b5cc-63b5a159428d" (reference "C2") (unit 1))
-))
-  )
-  (symbol
-    (lib_id "power:PWR_FLAG")
-    (at 77.216 88.9 0)
-    (unit 1)
-    (in_bom yes)
-    (on_board yes)
-    (dnp no)
-    (uuid 9bc4cbb6-3945-5b98-bec8-e1a54408f81e)
-    (property
-      "Reference"
-      "FLG1"
-      (at 77.216 88.9 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Value"
-      "PWR_FLAG"
-      (at 77.216 93.98 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Footprint"
-      ""
-      (at 77.216 96.52 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Datasheet"
-      ""
-      (at 77.216 99.06 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 0ddd136c-ccaa-506f-b554-61312657b407))
-    (instances (project
-  "gcode"
-  (path "/7a33582f-693b-53be-b5cc-63b5a159428d" (reference "FLG1") (unit 1))
-))
-  )
-  (symbol
-    (lib_id "power:PWR_FLAG")
-    (at 77.216 101.6 0)
-    (unit 1)
-    (in_bom yes)
-    (on_board yes)
-    (dnp no)
-    (uuid 700cd013-c6a1-590c-b1bc-48148d7816bc)
-    (property
-      "Reference"
-      "FLG2"
-      (at 77.216 101.6 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Value"
-      "PWR_FLAG"
-      (at 77.216 106.68 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Footprint"
-      ""
-      (at 77.216 109.22 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Datasheet"
-      ""
-      (at 77.216 111.76 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid e4eb5f77-7e51-5a1e-9c76-bf66a6d8a0b8))
-    (instances (project
-  "gcode"
-  (path "/7a33582f-693b-53be-b5cc-63b5a159428d" (reference "FLG2") (unit 1))
+  (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "C2") (unit 1))
 ))
   )
   (symbol
@@ -412,26 +412,26 @@
     (pin "3" (uuid e991318f-ce53-5975-beb1-dfe4a0cd068f))
     (instances (project
   "gcode"
-  (path "/7a33582f-693b-53be-b5cc-63b5a159428d" (reference "U1") (unit 1))
+  (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "U1") (unit 1))
 ))
   )
   (label
     "GND"
-    (at 78.232 58.42 0)
+    (at 77.216 66.04 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 482c8ada-8019-5ebd-8e5e-45fcc643aa75)
+  )
+  (label
+    "GND"
+    (at 78.232 83.82 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 47f08cf6-91e4-5aae-9302-b35a18dae589)
   )
   (label
     "GND"
-    (at 78.232 76.2 0)
+    (at 78.232 101.6 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 5701450f-9cd1-5d86-a284-986f327e766d)
-  )
-  (label
-    "GND"
-    (at 77.216 101.6 0)
-    (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid b15cace1-e273-587e-bcf6-51311fa11fbb)
   )
   (label
     "GND"
@@ -441,15 +441,15 @@
   )
   (label
     "VIN"
-    (at 78.232 50.8 0)
+    (at 77.216 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid c78124b6-e6d6-5c8f-a5af-a9bf6adc6e21)
+    (uuid 217d3b48-5c4c-5668-9bc2-99fc484e7982)
   )
   (label
     "VIN"
-    (at 77.216 88.9 0)
+    (at 78.232 76.2 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 002e2e15-0653-51fc-a641-3bcd36178339)
+    (uuid c78124b6-e6d6-5c8f-a5af-a9bf6adc6e21)
   )
   (label
     "VIN"
@@ -459,7 +459,7 @@
   )
   (label
     "VOUT"
-    (at 78.232 68.58 0)
+    (at 78.232 93.98 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 3e4e79c6-c831-588a-93b8-e2a3af514d62)
   )

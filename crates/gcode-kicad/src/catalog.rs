@@ -29,6 +29,14 @@ pub struct CircuitEntry {
     pub ir: NetlistIr,
 }
 
+/// KiCad convention: power symbols carry a `#`-prefixed reference so they are
+/// treated as ERC annotations rather than parts (excluded from BOM/netlist).
+/// Prefix marking a power-symbol reference (ERC annotation, not a part).
+pub const FLG_PREFIX: char = '#';
+const FLG1: &str = "#FLG1";
+const FLG2: &str = "#FLG2";
+const FLG3: &str = "#FLG3";
+
 fn power_flag(reference: &str) -> Component {
     Component::new(reference, "power:PWR_FLAG", "PWR_FLAG")
 }
@@ -71,13 +79,13 @@ fn voltage_divider() -> CircuitEntry {
             vec![
                 Component::new("R1", "Device:R", "39k"),
                 Component::new("R2", "Device:R", "10k"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
+                power_flag(FLG1),
+                power_flag(FLG2),
             ],
             vec![
-                Net::new("VIN", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("VIN", &[("R1", "1"), (FLG1, "1")]),
                 Net::new("VOUT", &[("R1", "2"), ("R2", "1")]),
-                Net::new("GND", &[("R2", "2"), ("FLG2", "1")]),
+                Net::new("GND", &[("R2", "2"), (FLG2, "1")]),
             ],
         ),
     }
@@ -95,13 +103,13 @@ fn rc_lowpass() -> CircuitEntry {
             vec![
                 Component::new("R1", "Device:R", "1k"),
                 Component::new("C1", "Device:C", "100nF"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
+                power_flag(FLG1),
+                power_flag(FLG2),
             ],
             vec![
-                Net::new("IN", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("IN", &[("R1", "1"), (FLG1, "1")]),
                 Net::new("OUT", &[("R1", "2"), ("C1", "1")]),
-                Net::new("GND", &[("C1", "2"), ("FLG2", "1")]),
+                Net::new("GND", &[("C1", "2"), (FLG2, "1")]),
             ],
         ),
     }
@@ -119,13 +127,13 @@ fn rc_highpass() -> CircuitEntry {
             vec![
                 Component::new("C1", "Device:C", "100nF"),
                 Component::new("R1", "Device:R", "1k"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
+                power_flag(FLG1),
+                power_flag(FLG2),
             ],
             vec![
-                Net::new("IN", &[("C1", "1"), ("FLG1", "1")]),
+                Net::new("IN", &[("C1", "1"), (FLG1, "1")]),
                 Net::new("OUT", &[("C1", "2"), ("R1", "1")]),
-                Net::new("GND", &[("R1", "2"), ("FLG2", "1")]),
+                Net::new("GND", &[("R1", "2"), (FLG2, "1")]),
             ],
         ),
     }
@@ -144,17 +152,17 @@ fn non_inverting_amp() -> CircuitEntry {
                 Component::new("U1", "Amplifier_Operational:LM321", "LM321"),
                 Component::new("R1", "Device:R", "10k"),
                 Component::new("R2", "Device:R", "91k"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
-                power_flag("FLG3"),
+                power_flag(FLG1),
+                power_flag(FLG2),
+                power_flag(FLG3),
             ],
             vec![
                 // LM321 pins: 1=+in, 2=V-, 3=-in, 4=out, 5=V+
-                Net::new("IN", &[("U1", "1"), ("FLG1", "1")]),
+                Net::new("IN", &[("U1", "1"), (FLG1, "1")]),
                 Net::new("FB", &[("U1", "3"), ("R1", "1"), ("R2", "1")]),
                 Net::new("OUT", &[("U1", "4"), ("R1", "2")]),
-                Net::new("GND", &[("R2", "2"), ("U1", "2"), ("FLG2", "1")]),
-                Net::new("VCC", &[("U1", "5"), ("FLG3", "1")]),
+                Net::new("GND", &[("R2", "2"), ("U1", "2"), (FLG2, "1")]),
+                Net::new("VCC", &[("U1", "5"), (FLG3, "1")]),
             ],
         ),
     }
@@ -173,16 +181,16 @@ fn inverting_amp() -> CircuitEntry {
                 Component::new("U1", "Amplifier_Operational:LM321", "LM321"),
                 Component::new("R1", "Device:R", "10k"),
                 Component::new("R2", "Device:R", "100k"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
-                power_flag("FLG3"),
+                power_flag(FLG1),
+                power_flag(FLG2),
+                power_flag(FLG3),
             ],
             vec![
-                Net::new("IN", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("IN", &[("R1", "1"), (FLG1, "1")]),
                 Net::new("SUM", &[("R1", "2"), ("R2", "1"), ("U1", "3")]),
                 Net::new("OUT", &[("R2", "2"), ("U1", "4")]),
-                Net::new("GND", &[("U1", "1"), ("U1", "2"), ("FLG2", "1")]),
-                Net::new("VCC", &[("U1", "5"), ("FLG3", "1")]),
+                Net::new("GND", &[("U1", "1"), ("U1", "2"), (FLG2, "1")]),
+                Net::new("VCC", &[("U1", "5"), (FLG3, "1")]),
             ],
         ),
     }
@@ -203,17 +211,17 @@ fn sallen_key_lowpass() -> CircuitEntry {
                 Component::new("R2", "Device:R", "10k"),
                 Component::new("C1", "Device:C", "10nF"),
                 Component::new("C2", "Device:C", "22nF"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
-                power_flag("FLG3"),
+                power_flag(FLG1),
+                power_flag(FLG2),
+                power_flag(FLG3),
             ],
             vec![
-                Net::new("IN", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("IN", &[("R1", "1"), (FLG1, "1")]),
                 Net::new("N1", &[("R1", "2"), ("R2", "1"), ("C1", "1")]),
                 Net::new("N2", &[("R2", "2"), ("C2", "1"), ("U1", "1")]),
                 Net::new("OUT", &[("C1", "2"), ("U1", "3"), ("U1", "4")]),
-                Net::new("GND", &[("C2", "2"), ("U1", "2"), ("FLG2", "1")]),
-                Net::new("VCC", &[("U1", "5"), ("FLG3", "1")]),
+                Net::new("GND", &[("C2", "2"), ("U1", "2"), (FLG2, "1")]),
+                Net::new("VCC", &[("U1", "5"), (FLG3, "1")]),
             ],
         ),
     }
@@ -231,15 +239,15 @@ fn ldo_regulator() -> CircuitEntry {
                 Component::new("U1", "Regulator_Linear:L7805", "L7805"),
                 Component::new("C1", "Device:C", "100nF"),
                 Component::new("C2", "Device:C", "100nF"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
+                power_flag(FLG1),
+                power_flag(FLG2),
             ],
             vec![
                 // L7805 pins: 1=IN, 2=GND, 3=OUT
-                Net::new("VIN", &[("U1", "1"), ("C1", "1"), ("FLG1", "1")]),
+                Net::new("VIN", &[("U1", "1"), ("C1", "1"), (FLG1, "1")]),
                 Net::new(
                     "GND",
-                    &[("U1", "2"), ("C1", "2"), ("C2", "2"), ("FLG2", "1")],
+                    &[("U1", "2"), ("C1", "2"), ("C2", "2"), (FLG2, "1")],
                 ),
                 Net::new("VOUT", &[("U1", "3"), ("C2", "1")]),
             ],
@@ -259,14 +267,14 @@ fn led_driver() -> CircuitEntry {
             vec![
                 Component::new("R1", "Device:R", "330"),
                 Component::new("D1", "Device:LED", "LED"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
+                power_flag(FLG1),
+                power_flag(FLG2),
             ],
             vec![
-                Net::new("VCC", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("VCC", &[("R1", "1"), (FLG1, "1")]),
                 // LED pins: 1=K, 2=A
                 Net::new("LED_A", &[("R1", "2"), ("D1", "2")]),
-                Net::new("GND", &[("D1", "1"), ("FLG2", "1")]),
+                Net::new("GND", &[("D1", "1"), (FLG2, "1")]),
             ],
         ),
     }
@@ -286,16 +294,16 @@ fn mosfet_switch() -> CircuitEntry {
                 Component::new("R2", "Device:R", "100k"),
                 Component::new("R3", "Device:R", "330"),
                 Component::new("D1", "Device:LED", "LED"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
-                power_flag("FLG3"),
+                power_flag(FLG1),
+                power_flag(FLG2),
+                power_flag(FLG3),
             ],
             vec![
                 // Q_NMOS_GSD pins: 1=G, 2=S, 3=D
-                Net::new("IN", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("IN", &[("R1", "1"), (FLG1, "1")]),
                 Net::new("GATE", &[("R1", "2"), ("Q1", "1"), ("R2", "1")]),
-                Net::new("GND", &[("R2", "2"), ("Q1", "2"), ("FLG2", "1")]),
-                Net::new("VCC", &[("R3", "1"), ("FLG3", "1")]),
+                Net::new("GND", &[("R2", "2"), ("Q1", "2"), (FLG2, "1")]),
+                Net::new("VCC", &[("R3", "1"), (FLG3, "1")]),
                 Net::new("LED_A", &[("R3", "2"), ("D1", "2")]),
                 Net::new("DRAIN", &[("D1", "1"), ("Q1", "3")]),
             ],
@@ -314,13 +322,13 @@ fn thermistor_divider() -> CircuitEntry {
             vec![
                 Component::new("R1", "Device:R", "10k"),
                 Component::new("TH1", "Device:Thermistor", "NTC_10k"),
-                power_flag("FLG1"),
-                power_flag("FLG2"),
+                power_flag(FLG1),
+                power_flag(FLG2),
             ],
             vec![
-                Net::new("VCC", &[("R1", "1"), ("FLG1", "1")]),
+                Net::new("VCC", &[("R1", "1"), (FLG1, "1")]),
                 Net::new("SENSE", &[("R1", "2"), ("TH1", "1")]),
-                Net::new("GND", &[("TH1", "2"), ("FLG2", "1")]),
+                Net::new("GND", &[("TH1", "2"), (FLG2, "1")]),
             ],
         ),
     }
@@ -375,7 +383,7 @@ mod tests {
                 if !matches!(net.name.as_str(), "VIN" | "VCC" | "GND") {
                     continue;
                 }
-                let has_flag = net.connections.iter().any(|(r, _)| r.starts_with("FLG"));
+                let has_flag = net.connections.iter().any(|(r, _)| r.starts_with(FLG_PREFIX));
                 let has_out = net
                     .connections
                     .iter()

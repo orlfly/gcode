@@ -1,7 +1,7 @@
 (kicad_sch
   (version 20230121)
   (generator gcode)
-  (uuid fdc778df-6e88-5670-8ef2-972380814994)
+  (uuid 4b89d50e-2e4f-5fb9-a6d0-a545b19a61f9)
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -148,10 +148,10 @@
     (in_bom yes)
     (on_board yes)
     (dnp no)
-    (uuid 9bc4cbb6-3945-5b98-bec8-e1a54408f81e)
+    (uuid acc9671a-e354-59fd-8863-980b45e20117)
     (property
       "Reference"
-      "FLG1"
+      "#FLG1"
       (at 77.216 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -173,10 +173,10 @@
       (at 77.216 63.5 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 0ddd136c-ccaa-506f-b554-61312657b407))
+    (pin "1" (uuid a36cda8e-ef05-5925-93ca-5a55dd5e56ad))
     (instances (project
   "gcode"
-  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "FLG1") (unit 1))
+  (path "/4b89d50e-2e4f-5fb9-a6d0-a545b19a61f9" (reference "#FLG1") (unit 1))
 ))
   )
   (symbol
@@ -186,10 +186,10 @@
     (in_bom yes)
     (on_board yes)
     (dnp no)
-    (uuid 700cd013-c6a1-590c-b1bc-48148d7816bc)
+    (uuid 6de89d92-455e-5a45-a156-653292ba1388)
     (property
       "Reference"
-      "FLG2"
+      "#FLG2"
       (at 77.216 66.04 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -211,10 +211,10 @@
       (at 77.216 76.2 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid e4eb5f77-7e51-5a1e-9c76-bf66a6d8a0b8))
+    (pin "1" (uuid 6c656b1a-f529-5f15-a6b6-034f955d95d6))
     (instances (project
   "gcode"
-  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "FLG2") (unit 1))
+  (path "/4b89d50e-2e4f-5fb9-a6d0-a545b19a61f9" (reference "#FLG2") (unit 1))
 ))
   )
   (symbol
@@ -253,7 +253,7 @@
     (pin "2" (uuid 66b0a935-4b4d-5e03-a964-f4fee59eb331))
     (instances (project
   "gcode"
-  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "R1") (unit 1))
+  (path "/4b89d50e-2e4f-5fb9-a6d0-a545b19a61f9" (reference "R1") (unit 1))
 ))
   )
   (symbol
@@ -292,14 +292,14 @@
     (pin "2" (uuid 09556d7f-b158-52c1-8498-43ce4ddb384e))
     (instances (project
   "gcode"
-  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "R2") (unit 1))
+  (path "/4b89d50e-2e4f-5fb9-a6d0-a545b19a61f9" (reference "R2") (unit 1))
 ))
   )
   (label
     "GND"
     (at 77.216 66.04 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid b15cace1-e273-587e-bcf6-51311fa11fbb)
+    (uuid 482c8ada-8019-5ebd-8e5e-45fcc643aa75)
   )
   (label
     "GND"
@@ -311,7 +311,7 @@
     "VIN"
     (at 77.216 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 002e2e15-0653-51fc-a641-3bcd36178339)
+    (uuid 217d3b48-5c4c-5668-9bc2-99fc484e7982)
   )
   (label
     "VIN"

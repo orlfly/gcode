@@ -226,6 +226,8 @@ pub enum EditError {
     Io(#[from] std::io::Error),
     #[error("file {0} does not exist; nothing to edit")]
     Missing(PathBuf),
+    #[error("cannot read the existing schematic: {0}")]
+    Read(#[from] crate::reader::ReadError),
 }
 
 /// A staged (not yet written) modification of a schematic file.
@@ -264,6 +266,23 @@ impl FileEdit {
             warnings: report.warnings,
             written: false,
         })
+    }
+
+    /// Stage an edit against the file's *current* content: the existing
+    /// schematic is read back into IR, so the diff reflects reality rather than
+    /// whatever the caller remembers.
+    pub fn stage_from_file(
+        path: impl Into<PathBuf>,
+        new_ir: &NetlistIr,
+        layout: Layout,
+    ) -> Result<Self, EditError> {
+        let path = path.into();
+        let text = std::fs::read_to_string(&path).map_err(|e| match e.kind() {
+            std::io::ErrorKind::NotFound => EditError::Missing(path.clone()),
+            _ => EditError::Io(e),
+        })?;
+        let old_ir = crate::reader::read_netlist(&text).map_err(EditError::Read)?;
+        Self::stage(path, &old_ir, new_ir, layout)
     }
 
     pub fn diff(&self) -> &IrDiff {
@@ -497,7 +516,7 @@ mod tests {
         let a = generate_with_report(&old, Layout::default()).unwrap().content;
         let b = generate_with_report(&new, Layout::default()).unwrap().content;
         assert_ne!(a, b, "content must change when a value changes");
-        for reference in ["R1", "R2", "FLG1", "FLG2"] {
+        for reference in ["R1", "R2", "#FLG1", "#FLG2"] {
             assert_eq!(
                 instance_uuid(&a, reference),
                 instance_uuid(&b, reference),
@@ -517,13 +536,35 @@ mod tests {
             }
         }
         let c = generate_with_report(&grown, Layout::default()).unwrap().content;
-        for reference in ["R1", "R2", "FLG1", "FLG2"] {
+        for reference in ["R1", "R2", "#FLG1", "#FLG2"] {
             assert_eq!(
                 instance_uuid(&a, reference),
                 instance_uuid(&c, reference),
                 "{reference} identity must survive an insertion"
             );
         }
+    }
+
+    #[test]
+    fn stage_from_file_uses_the_files_real_content() {
+        let dir = std::env::temp_dir().join(format!("gcode-edit-real-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("c.kicad_sch");
+        let old = divider();
+        std::fs::write(&path, generate_with_report(&old, Layout::default()).unwrap().content)
+            .unwrap();
+
+        // Change R2's value; the diff must be computed against the file.
+        let new = with_value(&old, "R2", "4.7k");
+        let mut edit = FileEdit::stage_from_file(&path, &new, Layout::default()).unwrap();
+        assert_eq!(edit.diff().fields_changed.len(), 1);
+        assert_eq!(edit.diff().fields_changed[0].reference, "R2");
+        // and staging against the file's own IR with no change is empty
+        let same = std::fs::read_to_string(&path).unwrap();
+        let current = crate::reader::read_netlist(&same).unwrap();
+        let noop = FileEdit::stage(&path, &current, &current, Layout::default()).unwrap();
+        assert!(noop.is_empty());
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]

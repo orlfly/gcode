@@ -1,7 +1,7 @@
 (kicad_sch
   (version 20230121)
   (generator gcode)
-  (uuid c750e77a-d5e5-52c5-bfbf-3cf797b309d6)
+  (uuid 4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb)
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -225,10 +225,10 @@
     (in_bom yes)
     (on_board yes)
     (dnp no)
-    (uuid 9bc4cbb6-3945-5b98-bec8-e1a54408f81e)
+    (uuid acc9671a-e354-59fd-8863-980b45e20117)
     (property
       "Reference"
-      "FLG1"
+      "#FLG1"
       (at 77.216 53.34 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -250,10 +250,10 @@
       (at 77.216 63.5 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid 0ddd136c-ccaa-506f-b554-61312657b407))
+    (pin "1" (uuid a36cda8e-ef05-5925-93ca-5a55dd5e56ad))
     (instances (project
   "gcode"
-  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "FLG1") (unit 1))
+  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "#FLG1") (unit 1))
 ))
   )
   (symbol
@@ -263,10 +263,10 @@
     (in_bom yes)
     (on_board yes)
     (dnp no)
-    (uuid 700cd013-c6a1-590c-b1bc-48148d7816bc)
+    (uuid 6de89d92-455e-5a45-a156-653292ba1388)
     (property
       "Reference"
-      "FLG2"
+      "#FLG2"
       (at 77.216 66.04 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -288,10 +288,10 @@
       (at 77.216 76.2 0)
       (effects (font (size 1.27 1.27)) hide)
     )
-    (pin "1" (uuid e4eb5f77-7e51-5a1e-9c76-bf66a6d8a0b8))
+    (pin "1" (uuid 6c656b1a-f529-5f15-a6b6-034f955d95d6))
     (instances (project
   "gcode"
-  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "FLG2") (unit 1))
+  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "#FLG2") (unit 1))
 ))
   )
   (symbol
@@ -330,7 +330,7 @@
     (pin "2" (uuid 66b0a935-4b4d-5e03-a964-f4fee59eb331))
     (instances (project
   "gcode"
-  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "R1") (unit 1))
+  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "R1") (unit 1))
 ))
   )
   (symbol
@@ -369,14 +369,14 @@
     (pin "2" (uuid 49064080-2d09-5ddd-9319-174b51234af7))
     (instances (project
   "gcode"
-  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "TH1") (unit 1))
+  (path "/4e748cc1-c6a3-5ca7-bb6e-af8026ef96bb" (reference "TH1") (unit 1))
 ))
   )
   (label
     "GND"
     (at 77.216 66.04 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid b15cace1-e273-587e-bcf6-51311fa11fbb)
+    (uuid 482c8ada-8019-5ebd-8e5e-45fcc643aa75)
   )
   (label
     "GND"
@@ -400,7 +400,7 @@
     "VCC"
     (at 77.216 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 9f81a7dc-3662-5f4b-a9ba-8e7065cc25a6)
+    (uuid e35fdd6d-3eca-5853-b207-0f5093c76fc2)
   )
   (label
     "VCC"

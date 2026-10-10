@@ -85,7 +85,7 @@ fn expected_nets(entry: &gcode_kicad::CircuitEntry) -> BTreeMap<String, BTreeSet
         let nodes: BTreeSet<(String, String)> = net
             .connections
             .iter()
-            .filter(|(r, _)| !r.starts_with("FLG"))
+            .filter(|(r, _)| !r.starts_with('#'))
             .map(|(r, p)| (r.clone(), p.clone()))
             .collect();
         out.insert(net.name.clone(), nodes);

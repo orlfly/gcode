@@ -1,7 +1,7 @@
 (kicad_sch
   (version 20230121)
   (generator gcode)
-  (uuid 6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1)
+  (uuid 5782830c-dd13-587d-9cdf-02b44439b44e)
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
@@ -314,8 +314,122 @@
     )
   )
   (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 53.34 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid acc9671a-e354-59fd-8863-980b45e20117)
+    (property
+      "Reference"
+      "#FLG1"
+      (at 77.216 53.34 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 58.42 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 60.96 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 63.5 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid a36cda8e-ef05-5925-93ca-5a55dd5e56ad))
+    (instances (project
+  "gcode"
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "#FLG1") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 66.04 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 6de89d92-455e-5a45-a156-653292ba1388)
+    (property
+      "Reference"
+      "#FLG2"
+      (at 77.216 66.04 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 71.12 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 73.66 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 76.2 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 6c656b1a-f529-5f15-a6b6-034f955d95d6))
+    (instances (project
+  "gcode"
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "#FLG2") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 78.74 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 0cdde106-4e33-54c6-8f4e-099282ba6cdc)
+    (property
+      "Reference"
+      "#FLG3"
+      (at 77.216 78.74 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 83.82 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 86.36 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 88.9 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid fa5159e6-3ff7-52b7-a537-1a94b27b7e7f))
+    (instances (project
+  "gcode"
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "#FLG3") (unit 1))
+))
+  )
+  (symbol
     (lib_id "Device:C")
-    (at 78.232 54.61 0)
+    (at 78.232 92.71 0)
     (unit 1)
     (in_bom yes)
     (on_board yes)
@@ -324,37 +438,37 @@
     (property
       "Reference"
       "C1"
-      (at 78.232 54.61 0)
+      (at 78.232 92.71 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "10nF"
-      (at 78.232 59.69 0)
+      (at 78.232 97.79 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
-      (at 78.232 62.23 0)
+      (at 78.232 100.33 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property
       "Datasheet"
       ""
-      (at 78.232 64.77 0)
+      (at 78.232 102.87 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid 9b01787e-0ed8-5dfd-a022-448536e9cfab))
     (pin "2" (uuid 07fde1a0-a51c-599b-aee0-911437968b75))
     (instances (project
   "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "C1") (unit 1))
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "C1") (unit 1))
 ))
   )
   (symbol
     (lib_id "Device:C")
-    (at 78.232 72.39 0)
+    (at 78.232 110.49 0)
     (unit 1)
     (in_bom yes)
     (on_board yes)
@@ -363,146 +477,32 @@
     (property
       "Reference"
       "C2"
-      (at 78.232 72.39 0)
+      (at 78.232 110.49 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "22nF"
-      (at 78.232 77.47 0)
+      (at 78.232 115.57 0)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
-      (at 78.232 80.01 0)
+      (at 78.232 118.11 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property
       "Datasheet"
       ""
-      (at 78.232 82.55 0)
+      (at 78.232 120.65 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (pin "1" (uuid b3f526f7-5a3a-577c-a66c-c4709dc1be4a))
     (pin "2" (uuid 1b98678f-a0cb-53a0-ab3f-3d44ddf3411f))
     (instances (project
   "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "C2") (unit 1))
-))
-  )
-  (symbol
-    (lib_id "power:PWR_FLAG")
-    (at 77.216 88.9 0)
-    (unit 1)
-    (in_bom yes)
-    (on_board yes)
-    (dnp no)
-    (uuid 9bc4cbb6-3945-5b98-bec8-e1a54408f81e)
-    (property
-      "Reference"
-      "FLG1"
-      (at 77.216 88.9 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Value"
-      "PWR_FLAG"
-      (at 77.216 93.98 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Footprint"
-      ""
-      (at 77.216 96.52 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Datasheet"
-      ""
-      (at 77.216 99.06 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 0ddd136c-ccaa-506f-b554-61312657b407))
-    (instances (project
-  "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "FLG1") (unit 1))
-))
-  )
-  (symbol
-    (lib_id "power:PWR_FLAG")
-    (at 77.216 101.6 0)
-    (unit 1)
-    (in_bom yes)
-    (on_board yes)
-    (dnp no)
-    (uuid 700cd013-c6a1-590c-b1bc-48148d7816bc)
-    (property
-      "Reference"
-      "FLG2"
-      (at 77.216 101.6 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Value"
-      "PWR_FLAG"
-      (at 77.216 106.68 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Footprint"
-      ""
-      (at 77.216 109.22 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Datasheet"
-      ""
-      (at 77.216 111.76 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid e4eb5f77-7e51-5a1e-9c76-bf66a6d8a0b8))
-    (instances (project
-  "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "FLG2") (unit 1))
-))
-  )
-  (symbol
-    (lib_id "power:PWR_FLAG")
-    (at 77.216 114.3 0)
-    (unit 1)
-    (in_bom yes)
-    (on_board yes)
-    (dnp no)
-    (uuid 5b145e85-0a7f-5f3f-bf42-6251f8b8bf47)
-    (property
-      "Reference"
-      "FLG3"
-      (at 77.216 114.3 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Value"
-      "PWR_FLAG"
-      (at 77.216 119.38 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Footprint"
-      ""
-      (at 77.216 121.92 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property
-      "Datasheet"
-      ""
-      (at 77.216 124.46 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid a562954b-3e01-52cd-b584-e68951b141fc))
-    (instances (project
-  "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "FLG3") (unit 1))
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "C2") (unit 1))
 ))
   )
   (symbol
@@ -541,7 +541,7 @@
     (pin "2" (uuid 66b0a935-4b4d-5e03-a964-f4fee59eb331))
     (instances (project
   "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "R1") (unit 1))
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "R1") (unit 1))
 ))
   )
   (symbol
@@ -580,7 +580,7 @@
     (pin "2" (uuid 09556d7f-b158-52c1-8498-43ce4ddb384e))
     (instances (project
   "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "R2") (unit 1))
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "R2") (unit 1))
 ))
   )
   (symbol
@@ -622,20 +622,20 @@
     (pin "5" (uuid 9cecf2b2-1857-5e1e-86f5-92f8f72bae52))
     (instances (project
   "gcode"
-  (path "/6bc1f50f-d11b-5fe5-97ee-4c6ffae665a1" (reference "U1") (unit 1))
+  (path "/5782830c-dd13-587d-9cdf-02b44439b44e" (reference "U1") (unit 1))
 ))
   )
   (label
     "GND"
-    (at 78.232 76.2 0)
+    (at 77.216 66.04 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 5701450f-9cd1-5d86-a284-986f327e766d)
+    (uuid 482c8ada-8019-5ebd-8e5e-45fcc643aa75)
   )
   (label
     "GND"
-    (at 77.216 101.6 0)
+    (at 78.232 114.3 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid b15cace1-e273-587e-bcf6-51311fa11fbb)
+    (uuid 5701450f-9cd1-5d86-a284-986f327e766d)
   )
   (label
     "GND"
@@ -645,9 +645,9 @@
   )
   (label
     "IN"
-    (at 77.216 88.9 0)
+    (at 77.216 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 349ffaaa-7afb-5610-8b58-2cfa2c742c62)
+    (uuid 8d8233dc-1e07-594b-8af5-db09a8a6df97)
   )
   (label
     "IN"
@@ -657,7 +657,7 @@
   )
   (label
     "N1"
-    (at 78.232 50.8 0)
+    (at 78.232 88.9 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 40c85986-6cd5-5673-a19e-caad26691529)
   )
@@ -675,7 +675,7 @@
   )
   (label
     "N2"
-    (at 78.232 68.58 0)
+    (at 78.232 106.68 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid 90ae5aa2-44dd-5590-888f-8a10c1a0170a)
   )
@@ -693,7 +693,7 @@
   )
   (label
     "OUT"
-    (at 78.232 58.42 0)
+    (at 78.232 96.52 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid aa974df6-a161-5494-a4b6-466ff0345bc0)
   )
@@ -711,9 +711,9 @@
   )
   (label
     "VCC"
-    (at 77.216 114.3 0)
+    (at 77.216 78.74 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 9a0956b1-be28-5379-9b5b-30c898d32569)
+    (uuid c20e0123-2496-5640-a234-7bf1fe586adb)
   )
   (label
     "VCC"
