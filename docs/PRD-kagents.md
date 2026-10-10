@@ -125,3 +125,15 @@ KAgents 是一个 CLI 形态的专业 code agent，让用户用自然语言完�
 - PCB 自动布局布线（agent 只做原理图级设计，布局留给用户或后续）
 - 元件采购/供应链集成
 - 自动控制高压/市电电路（实测能力以低压直流为限）
+
+---
+
+## 附：R0 技术验证清单（环境基线 2026-10-10）
+
+- 本机环境：Ubuntu 24.04.5，8 核 / 7.5G RAM / 37G 可用磁盘
+- 当前未安装：kicad、kicad-cli、ngspice、python sexpdata/pyvisa —— R0 启动时需先装 KiCad 10 + ngspice
+- 待验证项：
+  1. `kicad-cli` headless 导出 Gerber/网表 + ERC 运行
+  2. s-expression 解析选型：自研 vs `kiutils`/`kicad-python`，用 20 个开源 KiCad 项目实测覆盖率
+  3. ngspice headless 驱动：从网表跑 DC/AC/瞬态并取回波形数据
+  4. NL→网表中间表示的 schema 设计（先于任何 UI/CLI 工作）
