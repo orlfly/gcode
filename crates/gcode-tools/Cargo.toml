@@ -1,0 +1,13 @@
+[package]
+name = "gcode-tools"
+version = "0.1.0"
+edition = "2024"
+description = "Gcode circuit tools as jcode Tools"
+
+[dependencies]
+gcode-kicad = { workspace = true }
+jcode = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+async-trait = { workspace = true }

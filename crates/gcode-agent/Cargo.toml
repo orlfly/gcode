@@ -1,0 +1,17 @@
+[package]
+name = "gcode-agent"
+version = "0.1.0"
+edition = "2024"
+description = "Gcode agent: circuit-design agent loop on the jcode framework"
+
+[[bin]]
+name = "gcode"
+path = "src/main.rs"
+
+[dependencies]
+gcode-kicad = { workspace = true }
+gcode-tools = { workspace = true }
+jcode = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+crossterm = "0.29"

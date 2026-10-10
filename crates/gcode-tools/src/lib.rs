@@ -7,8 +7,7 @@
 use async_trait::async_trait;
 use gcode_kicad::{generate_schematic, Layout, NetlistIr};
 use gcode_kicad::erc::run_erc;
-use jcode_tool_core::{Tool, ToolContext};
-use jcode_tool_types::ToolOutput;
+use jcode::tool::{Tool, ToolContext, ToolOutput};
 use serde_json::Value;
 
 /// Tool: generate a KiCad schematic from a netlist IR.
@@ -132,7 +131,7 @@ pub fn all_tools() -> Vec<Box<dyn Tool>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use jcode_tool_core::ToolContext;
+    use jcode::tool::ToolContext;
 
     fn ctx() -> ToolContext {
         ToolContext {
@@ -142,7 +141,7 @@ mod tests {
             working_dir: None,
             stdin_request_tx: None,
             graceful_shutdown_signal: None,
-            execution_mode: jcode_tool_core::ToolExecutionMode::AgentTurn,
+            execution_mode: jcode::tool::ToolExecutionMode::AgentTurn,
         }
     }
 
