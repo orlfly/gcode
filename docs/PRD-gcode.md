@@ -165,16 +165,16 @@ trait Instrument {
 }
 ```
 
-### 7.5 技术
+### 7.4 技术总览
 
 - KiCad s-expression 解析器（自研或复用 kicad-python）
 - `kicad-cli` headless 导出与检查；KiCad IPC API 备选
 - ngspice 驱动层（复用 KiCad 仿真模型格式）
-- 实测：Sigrok CLI 集成起步，SCPI（pyvisa）为 P1.5+ 扩展
+- 实测：gcode-instrument HAL（Instrument trait）+ Sigrok CLI 集成起步，SCPI 为 R2+ 扩展
 - GRBL G-code 生成器 + SVG 渲染
 - LLM 编排：NL → 中间表示为 agent 层；中间表示 → 文件为确定性代码
 
-### 7.4 假设与开放问题
+### 7.5 假设与开放问题
 
 **假设**：
 - NL → 结构化网表的正确率可通过验证层 + ERC/仿真闭环达到可用（核心赌注）
