@@ -1,0 +1,412 @@
+(kicad_sch
+  (version 20230121)
+  (generator gcode)
+  (uuid c750e77a-d5e5-52c5-bfbf-3cf797b309d6)
+  (paper "A4")
+  (title_block (title "Gcode generated"))
+  (lib_symbols
+    (symbol
+      "Device:R"
+      (pin_numbers hide)
+      (pin_names (offset 0))
+      (in_bom yes)
+      (on_board yes)
+      (property
+        "Reference"
+        "R"
+        (at 2.032 0 90)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Value"
+        "R"
+        (at 0 0 90)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Footprint"
+        ""
+        (at -1.778 0 90)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Datasheet"
+        "~"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_keywords"
+        "R res resistor"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_description"
+        "Resistor"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_fp_filters"
+        "R_*"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (symbol
+        "R_0_1"
+        (rectangle (start -1.016 -2.54) (end 1.016 2.54) (stroke (width 0.254) (type default)) (fill (type none)))
+      )
+      (symbol
+        "R_1_1"
+        (pin
+          passive
+          line
+          (at 0 3.81 270)
+          (length 1.27)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+        (pin
+          passive
+          line
+          (at 0 -3.81 90)
+          (length 1.27)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+    (symbol
+      "Device:Thermistor"
+      (pin_numbers hide)
+      (pin_names (offset 0))
+      (in_bom yes)
+      (on_board yes)
+      (property
+        "Reference"
+        "TH"
+        (at 2.54 1.27 90)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Value"
+        "Thermistor"
+        (at -2.54 0 90)
+        (effects (font (size 1.27 1.27)) (justify bottom))
+      )
+      (property
+        "Footprint"
+        ""
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Datasheet"
+        "~"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_keywords"
+        "R res thermistor"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_description"
+        "Temperature dependent resistor"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_fp_filters"
+        "R_*"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (symbol
+        "Thermistor_0_1"
+        (rectangle (start -1.016 2.54) (end 1.016 -2.54) (stroke (width 0.2032) (type default)) (fill (type none)))
+        (polyline
+          (pts (xy -1.905 3.175) (xy -1.905 1.905) (xy 1.905 -1.905) (xy 1.905 -3.175) (xy 1.905 -3.175))
+          (stroke (width 0.254) (type default))
+          (fill (type none))
+        )
+      )
+      (symbol
+        "Thermistor_1_1"
+        (pin
+          passive
+          line
+          (at 0 5.08 270)
+          (length 2.54)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+        (pin
+          passive
+          line
+          (at 0 -5.08 90)
+          (length 2.54)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+    (symbol
+      "power:PWR_FLAG"
+      (power)
+      (pin_numbers hide)
+      (pin_names (offset 0) hide)
+      (in_bom yes)
+      (on_board yes)
+      (property
+        "Reference"
+        "#FLG"
+        (at 0 1.905 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Value"
+        "PWR_FLAG"
+        (at 0 3.81 0)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Footprint"
+        ""
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Datasheet"
+        "~"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_keywords"
+        "flag power"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_description"
+        "Special symbol for telling ERC where power comes from"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (symbol
+        "PWR_FLAG_0_0"
+        (pin
+          power_out
+          line
+          (at 0 0 90)
+          (length 0)
+          (name "pwr" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+      )
+      (symbol
+        "PWR_FLAG_0_1"
+        (polyline
+          (pts (xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27))
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 53.34 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 9bc4cbb6-3945-5b98-bec8-e1a54408f81e)
+    (property
+      "Reference"
+      "FLG1"
+      (at 77.216 53.34 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 58.42 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 60.96 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 63.5 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 0ddd136c-ccaa-506f-b554-61312657b407))
+    (instances (project
+  "gcode"
+  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "FLG1") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 66.04 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 700cd013-c6a1-590c-b1bc-48148d7816bc)
+    (property
+      "Reference"
+      "FLG2"
+      (at 77.216 66.04 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 71.12 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 73.66 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 76.2 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid e4eb5f77-7e51-5a1e-9c76-bf66a6d8a0b8))
+    (instances (project
+  "gcode"
+  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "FLG2") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "Device:R")
+    (at 77.216 80.01 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 43d6804b-f0e7-5dee-a29b-4e86c08abf2f)
+    (property
+      "Reference"
+      "R1"
+      (at 77.216 80.01 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Value"
+      "10k"
+      (at 77.216 85.09 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 87.63 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 90.17 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 5ea035f6-b38a-5115-8605-a079300745cd))
+    (pin "2" (uuid 66b0a935-4b4d-5e03-a964-f4fee59eb331))
+    (instances (project
+  "gcode"
+  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "R1") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "Device:Thermistor")
+    (at 78.105 99.06 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid ca83dc24-060d-55db-bbaf-be8ec272db60)
+    (property
+      "Reference"
+      "TH1"
+      (at 78.105 99.06 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Value"
+      "NTC_10k"
+      (at 78.105 104.14 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Footprint"
+      ""
+      (at 78.105 106.68 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 78.105 109.22 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 75b3527b-f735-57c4-97d5-9400f2c0abf0))
+    (pin "2" (uuid 49064080-2d09-5ddd-9319-174b51234af7))
+    (instances (project
+  "gcode"
+  (path "/c750e77a-d5e5-52c5-bfbf-3cf797b309d6" (reference "TH1") (unit 1))
+))
+  )
+  (label
+    "GND"
+    (at 77.216 66.04 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid b15cace1-e273-587e-bcf6-51311fa11fbb)
+  )
+  (label
+    "GND"
+    (at 78.105 104.14 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid e219e328-cfdd-5d93-84b4-a5a6843895ab)
+  )
+  (label
+    "SENSE"
+    (at 77.216 83.82 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 46bc8fb7-4483-5c1a-aa9f-03716afc75b8)
+  )
+  (label
+    "SENSE"
+    (at 78.105 93.98 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 58fb0b34-3b47-56ae-a508-eb39feb6fb94)
+  )
+  (label
+    "VCC"
+    (at 77.216 53.34 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 9f81a7dc-3662-5f4b-a9ba-8e7065cc25a6)
+  )
+  (label
+    "VCC"
+    (at 77.216 76.2 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid f2cfa3b3-596f-5f96-b294-7cb463f16941)
+  )
+  (sheet_instances (path "/" (page "1")))
+)

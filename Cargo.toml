@@ -5,7 +5,9 @@ resolver = "3"
 [workspace.dependencies]
 gcode-kicad = { path = "crates/gcode-kicad" }
 gcode-tools = { path = "crates/gcode-tools" }
-jcode = { path = "/opt/workspace/jcode" }
+# jcode 本体（上游，只读）。用兄弟目录相对路径，兼容两种布局：
+#   /opt/workspace/{gcode,jcode}  与  ~/workspace/{gcode,jcode}
+jcode = { path = "../jcode" }
 anyhow = "1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "fs"] }
 serde = { version = "1", features = ["derive"] }

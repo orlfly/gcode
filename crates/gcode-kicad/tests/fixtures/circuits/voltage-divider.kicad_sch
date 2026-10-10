@@ -1,0 +1,335 @@
+(kicad_sch
+  (version 20230121)
+  (generator gcode)
+  (uuid fdc778df-6e88-5670-8ef2-972380814994)
+  (paper "A4")
+  (title_block (title "Gcode generated"))
+  (lib_symbols
+    (symbol
+      "Device:R"
+      (pin_numbers hide)
+      (pin_names (offset 0))
+      (in_bom yes)
+      (on_board yes)
+      (property
+        "Reference"
+        "R"
+        (at 2.032 0 90)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Value"
+        "R"
+        (at 0 0 90)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Footprint"
+        ""
+        (at -1.778 0 90)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Datasheet"
+        "~"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_keywords"
+        "R res resistor"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_description"
+        "Resistor"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_fp_filters"
+        "R_*"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (symbol
+        "R_0_1"
+        (rectangle (start -1.016 -2.54) (end 1.016 2.54) (stroke (width 0.254) (type default)) (fill (type none)))
+      )
+      (symbol
+        "R_1_1"
+        (pin
+          passive
+          line
+          (at 0 3.81 270)
+          (length 1.27)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+        (pin
+          passive
+          line
+          (at 0 -3.81 90)
+          (length 1.27)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+    (symbol
+      "power:PWR_FLAG"
+      (power)
+      (pin_numbers hide)
+      (pin_names (offset 0) hide)
+      (in_bom yes)
+      (on_board yes)
+      (property
+        "Reference"
+        "#FLG"
+        (at 0 1.905 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Value"
+        "PWR_FLAG"
+        (at 0 3.81 0)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Footprint"
+        ""
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "Datasheet"
+        "~"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_keywords"
+        "flag power"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (property
+        "ki_description"
+        "Special symbol for telling ERC where power comes from"
+        (at 0 0 0)
+        (effects (font (size 1.27 1.27)) hide)
+      )
+      (symbol
+        "PWR_FLAG_0_0"
+        (pin
+          power_out
+          line
+          (at 0 0 90)
+          (length 0)
+          (name "pwr" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+      )
+      (symbol
+        "PWR_FLAG_0_1"
+        (polyline
+          (pts (xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27))
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
+      )
+    )
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 53.34 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 9bc4cbb6-3945-5b98-bec8-e1a54408f81e)
+    (property
+      "Reference"
+      "FLG1"
+      (at 77.216 53.34 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 58.42 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 60.96 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 63.5 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 0ddd136c-ccaa-506f-b554-61312657b407))
+    (instances (project
+  "gcode"
+  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "FLG1") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "power:PWR_FLAG")
+    (at 77.216 66.04 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 700cd013-c6a1-590c-b1bc-48148d7816bc)
+    (property
+      "Reference"
+      "FLG2"
+      (at 77.216 66.04 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Value"
+      "PWR_FLAG"
+      (at 77.216 71.12 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 73.66 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 76.2 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid e4eb5f77-7e51-5a1e-9c76-bf66a6d8a0b8))
+    (instances (project
+  "gcode"
+  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "FLG2") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "Device:R")
+    (at 77.216 80.01 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 43d6804b-f0e7-5dee-a29b-4e86c08abf2f)
+    (property
+      "Reference"
+      "R1"
+      (at 77.216 80.01 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Value"
+      "39k"
+      (at 77.216 85.09 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 87.63 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 90.17 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 5ea035f6-b38a-5115-8605-a079300745cd))
+    (pin "2" (uuid 66b0a935-4b4d-5e03-a964-f4fee59eb331))
+    (instances (project
+  "gcode"
+  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "R1") (unit 1))
+))
+  )
+  (symbol
+    (lib_id "Device:R")
+    (at 77.216 97.79 0)
+    (unit 1)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (uuid 4cff6209-71c8-50b3-ade2-73db045addec)
+    (property
+      "Reference"
+      "R2"
+      (at 77.216 97.79 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Value"
+      "10k"
+      (at 77.216 102.87 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property
+      "Footprint"
+      ""
+      (at 77.216 105.41 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property
+      "Datasheet"
+      ""
+      (at 77.216 107.95 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 1b0fc78a-5ebf-56b6-9505-6c3231782ac5))
+    (pin "2" (uuid 09556d7f-b158-52c1-8498-43ce4ddb384e))
+    (instances (project
+  "gcode"
+  (path "/fdc778df-6e88-5670-8ef2-972380814994" (reference "R2") (unit 1))
+))
+  )
+  (label
+    "GND"
+    (at 77.216 66.04 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid b15cace1-e273-587e-bcf6-51311fa11fbb)
+  )
+  (label
+    "GND"
+    (at 77.216 101.6 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 509e8ece-15b4-5507-911e-b39a644e3145)
+  )
+  (label
+    "VIN"
+    (at 77.216 53.34 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 002e2e15-0653-51fc-a641-3bcd36178339)
+  )
+  (label
+    "VIN"
+    (at 77.216 76.2 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 1fea8a77-9b15-5b5c-8245-1be95ed25718)
+  )
+  (label
+    "VOUT"
+    (at 77.216 83.82 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 919f9d93-f53d-5bbc-8e28-e659e9d8b165)
+  )
+  (label
+    "VOUT"
+    (at 77.216 93.98 0)
+    (effects (font (size 1.27 1.27)) (justify left bottom))
+    (uuid 8a45015e-2015-5d7c-8345-7c0c552e2bc9)
+  )
+  (sheet_instances (path "/" (page "1")))
+)
