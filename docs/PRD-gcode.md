@@ -97,7 +97,75 @@ Gcode 是一个 CLI 形态的专业 code agent，让用户用自然语言完成 
 6. **激光参数知识库**：板材 → 功率/速度/遍数推荐起点
 7. **对话式迭代**：所有修改以 diff 呈现，确认后写回
 
-### 7.3 技术
+### 7.3 实测与功能测试模块（gcode-instrument）
+
+> 产品定位：让 agent 不只会「纸上仿真」，还能驱动真实测量硬件验证物理电路板，并给出仿真-实测偏差分析与 PASS/FAIL 判定。
+
+#### 7.3.1 检测能力分级
+
+| 级别 | 能力 | 硬件依赖 | 阶段 |
+|---|---|---|---|
+| L0 无源检测 | 通断测试、电阻测量、短路排查 | 万用表（Sigrok 兼容 DMM） | R1.5 首期 |
+| L1 有源直流 | 电压/电流采集、功耗测量、工作点验证 | 可编程电源（串口控制）+ DMM | R1.5 首期 |
+| L2 动态测试 | PWM 占空比/频率、逻辑电平、简单时序验证 | 逻辑分析仪（Sigrok fx2/lad） | R1.5 后期 |
+| L3 波形级 | 示波器采集、纹波/上升沿测量、频响实测 | SCPI 示波器（pyvisa） | R2+ |
+
+**明确不做**：市电/高压电路（≤48V DC 上限）、大电流功率测试（≤5A）、需焊接探针的自动化测试。
+
+#### 7.3.2 功能测试流程（闭环）
+
+```
+NL 描述测试意图（"验证 3.3V 轨供电正常、LED 驱动输出频率 1kHz"）
+  → agent 生成结构化测试计划（Test Plan IR：步骤/通道/预期值/容差）
+  → 用户确认（带电操作强制确认，不可跳过）
+  → 硬件执行层逐步骤执行，采集数据
+  → 与仿真基准比对（引用 gcode-sim 的同节点仿真值）
+  → 输出测试报告：每项 PASS/FAIL、偏差值、偏差原因分析（元件容差/焊点/设计错误分类）
+  → FAIL 时联动 P3 闭环：给出修改建议回到设计/仿真
+```
+
+#### 7.3.3 硬件抽象层（HAL）
+
+统一 trait（Rust `gcode-instrument` 内），屏蔽设备差异：
+
+```rust
+trait Instrument {
+    fn capabilities(&self) -> Capabilities;   // 可测什么
+    async fn measure(&self, req: MeasureRequest) -> Result<Measurement>;
+    async fn source(&self, req: SourceRequest) -> Result<()>;  // 可编程电源输出（需确认令牌）
+}
+// 实现：SigrokDmm（CLI 驱动 sigrok-cli）、SerialPps（串口 SCPI-lite）、ScpiInstrument（pyvisa 桥/Rust scpi）
+```
+
+- 首期设备目标：任一 Sigrok 支持的 DMM + 一款串口可编程电源（如 RD6006 类）
+- 设备能力发现：启动时探测并声明支持哪些测试级别，agent 据此过滤可生成的测试计划
+
+#### 7.3.4 安全约束（硬性）
+
+1. 电压上限 48V DC、电流上限 5A，超限请求直接拒绝
+2. `source()` 操作（给被测板上电/改电压）必须携带用户当轮确认令牌，agent 不可自签
+3. 测试计划中的预期值必须来自仿真结果或用户显式输入，agent 不可凭空设定
+4. 异常熔断：读到超预期 2 倍以上的电流立即切断电源输出并终止测试
+
+#### 7.3.5 测试报告 schema（TestReport IR）
+
+```json
+{
+  "plan_id": "tp-001",
+  "items": [
+    {"step": 1, "target": "3V3 rail", "expected": {"value": 3.3, "tol": 0.1},
+     "measured": 3.31, "unit": "V", "verdict": "PASS"},
+    {"step": 2, "target": "LED PWM freq", "expected": {"value": 1000, "tol": 50},
+     "measured": 987, "unit": "Hz", "verdict": "PASS"},
+    {"step": 3, "target": "opamp gain @1kHz", "expected": {"value": 10, "tol": 0.5},
+     "measured": 6.2, "unit": "x", "verdict": "FAIL",
+     "analysis": "增益偏低，疑似反馈电阻实际值偏差或 R2 未焊好，建议优先排查 R2"}
+  ],
+  "summary": "2/3 PASS，1 FAIL 已归因"
+}
+```
+
+### 7.5 技术
 
 - KiCad s-expression 解析器（自研或复用 kicad-python）
 - `kicad-cli` headless 导出与检查；KiCad IPC API 备选
