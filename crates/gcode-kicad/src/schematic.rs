@@ -17,10 +17,13 @@ use crate::sexpr::Sexpr;
 use crate::symbols::{self, PinInfo, SymbolLibrary};
 use std::collections::BTreeMap;
 
-/// KiCad schematic format token. 20230121 is KiCad 7's; later versions read it.
-pub const KICAD_SCH_VERSION: &str = "20230121";
+/// KiCad schematic format token. 20260306 is what KiCad 10 writes; the file is
+/// verified against a real `kicad-cli` 10 (load + netlist + ERC).
+pub const KICAD_SCH_VERSION: &str = "20260306";
 /// Generator name written into the file.
 pub const GENERATOR: &str = "gcode";
+/// Generator version, matching the format we emit.
+pub const GENERATOR_VERSION: &str = "10.0";
 /// Project name used in per-symbol `instances` blocks.
 pub const PROJECT: &str = "gcode";
 
@@ -166,8 +169,9 @@ pub fn generate_with_report(ir: &NetlistIr, layout: Layout) -> Result<Generation
     let mut root = Vec::new();
     root.push(Sexpr::Atom("kicad_sch".into()));
     root.push(list("version", vec![atom(KICAD_SCH_VERSION)]));
-    root.push(list("generator", vec![Sexpr::Atom(GENERATOR.into())]));
-    root.push(list("uuid", vec![Sexpr::Atom(root_uuid.clone())]));
+    root.push(list("generator", vec![str_(GENERATOR)]));
+    root.push(list("generator_version", vec![str_(GENERATOR_VERSION)]));
+    root.push(list("uuid", vec![str_(&root_uuid)]));
     root.push(list("paper", vec![str_("A4")]));
     root.push(list(
         "title_block",
@@ -315,8 +319,10 @@ fn stub_symbol(lib_id: &str) -> Sexpr {
         Sexpr::Atom("symbol".into()),
         str_(lib_id),
         list("pin_names", vec![list("offset", vec![atom("0.254")])]),
+        list("exclude_from_sim", vec![Sexpr::Atom("no".into())]),
         list("in_bom", vec![Sexpr::Atom("yes".into())]),
         list("on_board", vec![Sexpr::Atom("yes".into())]),
+        list("in_pos_files", vec![Sexpr::Atom("yes".into())]),
         Sexpr::List(vec![
             Sexpr::Atom("property".into()),
             str_("Reference"),
@@ -353,12 +359,15 @@ fn stub_symbol(lib_id: &str) -> Sexpr {
             str_("Datasheet"),
             str_(""),
             list("at", vec![atom("0"), atom("0"), atom("0")]),
+            list("hide", vec![Sexpr::Atom("yes".into())]),
+            list("show_name", vec![Sexpr::Atom("no".into())]),
+            list("do_not_autoplace", vec![Sexpr::Atom("no".into())]),
             list(
                 "effects",
-                vec![
-                    list("font", vec![list("size", vec![atom("1.27"), atom("1.27")])]),
-                    Sexpr::Atom("hide".into()),
-                ],
+                vec![list(
+                    "font",
+                    vec![list("size", vec![atom("1.27"), atom("1.27")])],
+                )],
             ),
         ]),
     ])
@@ -380,10 +389,13 @@ fn symbol_instance(
             vec![atom(fmt_num(sx)), atom(fmt_num(sy)), atom("0")],
         ),
         list("unit", vec![atom("1")]),
+        list("body_style", vec![atom("1")]),
+        list("exclude_from_sim", vec![Sexpr::Atom("no".into())]),
         list("in_bom", vec![Sexpr::Atom("yes".into())]),
         list("on_board", vec![Sexpr::Atom("yes".into())]),
+        list("in_pos_files", vec![Sexpr::Atom("yes".into())]),
         list("dnp", vec![Sexpr::Atom("no".into())]),
-        list("uuid", vec![Sexpr::Atom(det_uuid(&format!("inst:{}:{}", c.lib_id, c.reference)))]),
+        list("uuid", vec![str_(&det_uuid(&format!("inst:{}:{}", c.lib_id, c.reference)))]),
         // Reference above, Value below the symbol body.
         property(
             "Reference",
@@ -422,10 +434,7 @@ fn symbol_instance(
             str_(&p.number),
             list(
                 "uuid",
-                vec![Sexpr::Atom(det_uuid(&format!(
-                    "pin:{}:{}",
-                    c.reference, p.number
-                )))],
+                vec![str_(&det_uuid(&format!("pin:{}:{}", c.reference, p.number)))],
             ),
         ]));
     }
@@ -457,26 +466,26 @@ fn property(
     hide: bool,
     _seed: &str,
 ) -> Sexpr {
-    // KiCad 7 properties carry no uuid.
-    let mut effects = vec![list(
-        "font",
-        vec![list("size", vec![atom("1.27"), atom("1.27")])],
-    )];
-    if hide {
-        // KiCad writes a bare `hide` token, not a `(hide)` list.
-        effects.push(Sexpr::Atom("hide".into()));
-    }
-    Sexpr::List(vec![
+    // KiCad 10 property form: at, [hide yes], show_name, do_not_autoplace, effects.
+    let mut items = vec![
         Sexpr::Atom("property".into()),
         str_(name),
         str_(value),
         list("at", vec![atom(fmt_num(sx)), atom(fmt_num(sy)), atom("0")]),
-        Sexpr::List({
-            let mut e = vec![Sexpr::Atom("effects".into())];
-            e.extend(effects);
-            e
-        }),
-    ])
+    ];
+    if hide {
+        items.push(list("hide", vec![Sexpr::Atom("yes".into())]));
+    }
+    items.push(list("show_name", vec![Sexpr::Atom("no".into())]));
+    items.push(list("do_not_autoplace", vec![Sexpr::Atom("no".into())]));
+    items.push(list(
+        "effects",
+        vec![list(
+            "font",
+            vec![list("size", vec![atom("1.27"), atom("1.27")])],
+        )],
+    ));
+    Sexpr::List(items)
 }
 
 fn label(name: &str, x: f64, y: f64, seed: &str) -> Sexpr {
@@ -492,7 +501,7 @@ fn label(name: &str, x: f64, y: f64, seed: &str) -> Sexpr {
                 vec![Sexpr::Atom("left".into()), Sexpr::Atom("bottom".into())],
             ),
         ]),
-        list("uuid", vec![Sexpr::Atom(det_uuid(&format!("label:{seed}:{name}")))]),
+        list("uuid", vec![str_(&det_uuid(&format!("label:{seed}:{name}")))]),
     ])
 }
 

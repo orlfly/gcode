@@ -1,62 +1,85 @@
 (kicad_sch
-  (version 20230121)
-  (generator gcode)
-  (uuid a679a91f-e4a1-51d4-bb2c-e3484a9c3111)
+  (version 20260306)
+  (generator "gcode")
+  (generator_version "10.0")
+  (uuid "a679a91f-e4a1-51d4-bb2c-e3484a9c3111")
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
     (symbol
       "Device:C"
-      (pin_numbers hide)
+      (pin_numbers (hide yes))
       (pin_names (offset 0.254))
+      (exclude_from_sim no)
       (in_bom yes)
       (on_board yes)
+      (in_pos_files yes)
+      (duplicate_pin_numbers_are_jumpers no)
       (property
         "Reference"
         "C"
         (at 0.635 2.54 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)) (justify left))
       )
       (property
         "Value"
         "C"
         (at 0.635 -2.54 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)) (justify left))
       )
       (property
         "Footprint"
         ""
         (at 0.9652 -3.81 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Datasheet"
-        "~"
+        ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Description"
+        "Unpolarized capacitor"
+        (at 0 0 0)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_keywords"
         "cap capacitor"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property
-        "ki_description"
-        "Unpolarized capacitor"
-        (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_fp_filters"
         "C_*"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (symbol
         "C_0_1"
-        (polyline (pts (xy -2.032 -0.762) (xy 2.032 -0.762)) (stroke (width 0.508) (type default)) (fill (type none)))
         (polyline (pts (xy -2.032 0.762) (xy 2.032 0.762)) (stroke (width 0.508) (type default)) (fill (type none)))
+        (polyline (pts (xy -2.032 -0.762) (xy 2.032 -0.762)) (stroke (width 0.508) (type default)) (fill (type none)))
       )
       (symbol
         "C_1_1"
@@ -65,7 +88,7 @@
           line
           (at 0 3.81 270)
           (length 2.794)
-          (name "~" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
         )
         (pin
@@ -73,58 +96,81 @@
           line
           (at 0 -3.81 90)
           (length 2.794)
-          (name "~" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "2" (effects (font (size 1.27 1.27))))
         )
       )
+      (embedded_fonts no)
     )
     (symbol
       "Device:R"
-      (pin_numbers hide)
+      (pin_numbers (hide yes))
       (pin_names (offset 0))
+      (exclude_from_sim no)
       (in_bom yes)
       (on_board yes)
+      (in_pos_files yes)
+      (duplicate_pin_numbers_are_jumpers no)
       (property
         "Reference"
         "R"
         (at 2.032 0 90)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)))
       )
       (property
         "Value"
         "R"
         (at 0 0 90)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)))
       )
       (property
         "Footprint"
         ""
         (at -1.778 0 90)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Datasheet"
-        "~"
+        ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Description"
+        "Resistor"
+        (at 0 0 0)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_keywords"
         "R res resistor"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property
-        "ki_description"
-        "Resistor"
-        (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_fp_filters"
         "R_*"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (symbol
         "R_0_1"
@@ -137,7 +183,7 @@
           line
           (at 0 3.81 270)
           (length 1.27)
-          (name "~" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
         )
         (pin
@@ -145,53 +191,74 @@
           line
           (at 0 -3.81 90)
           (length 1.27)
-          (name "~" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "2" (effects (font (size 1.27 1.27))))
         )
       )
+      (embedded_fonts no)
     )
     (symbol
       "power:PWR_FLAG"
-      (power)
-      (pin_numbers hide)
-      (pin_names (offset 0) hide)
+      (power global)
+      (pin_numbers (hide yes))
+      (pin_names (offset 0) (hide yes))
+      (exclude_from_sim no)
       (in_bom yes)
       (on_board yes)
+      (in_pos_files yes)
+      (duplicate_pin_numbers_are_jumpers no)
       (property
         "Reference"
         "#FLG"
         (at 0 1.905 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Value"
         "PWR_FLAG"
         (at 0 3.81 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)))
       )
       (property
         "Footprint"
         ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Datasheet"
-        "~"
+        ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Description"
+        "Special symbol for telling ERC where power comes from"
+        (at 0 0 0)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_keywords"
         "flag power"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property
-        "ki_description"
-        "Special symbol for telling ERC where power comes from"
-        (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (symbol
         "PWR_FLAG_0_0"
@@ -200,7 +267,7 @@
           line
           (at 0 0 90)
           (length 0)
-          (name "pwr" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
         )
       )
@@ -212,41 +279,57 @@
           (fill (type none))
         )
       )
+      (embedded_fonts no)
     )
   )
   (symbol
     (lib_id "power:PWR_FLAG")
     (at 77.216 53.34 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid acc9671a-e354-59fd-8863-980b45e20117)
+    (uuid "acc9671a-e354-59fd-8863-980b45e20117")
     (property
       "Reference"
       "#FLG1"
       (at 77.216 53.34 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "PWR_FLAG"
       (at 77.216 58.42 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 77.216 60.96 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 77.216 63.5 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid a36cda8e-ef05-5925-93ca-5a55dd5e56ad))
+    (pin "1" (uuid "a36cda8e-ef05-5925-93ca-5a55dd5e56ad"))
     (instances (project
   "gcode"
   (path "/a679a91f-e4a1-51d4-bb2c-e3484a9c3111" (reference "#FLG1") (unit 1))
@@ -256,35 +339,50 @@
     (lib_id "power:PWR_FLAG")
     (at 77.216 66.04 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid 6de89d92-455e-5a45-a156-653292ba1388)
+    (uuid "6de89d92-455e-5a45-a156-653292ba1388")
     (property
       "Reference"
       "#FLG2"
       (at 77.216 66.04 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "PWR_FLAG"
       (at 77.216 71.12 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 77.216 73.66 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 77.216 76.2 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid 6c656b1a-f529-5f15-a6b6-034f955d95d6))
+    (pin "1" (uuid "6c656b1a-f529-5f15-a6b6-034f955d95d6"))
     (instances (project
   "gcode"
   (path "/a679a91f-e4a1-51d4-bb2c-e3484a9c3111" (reference "#FLG2") (unit 1))
@@ -294,36 +392,49 @@
     (lib_id "Device:C")
     (at 78.232 80.01 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid ff20a7ae-f76c-5b77-b96d-1f100e5e8e9f)
+    (uuid "ff20a7ae-f76c-5b77-b96d-1f100e5e8e9f")
     (property
       "Reference"
       "C1"
       (at 78.232 80.01 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "100nF"
       (at 78.232 85.09 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 78.232 87.63 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 78.232 90.17 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid 9b01787e-0ed8-5dfd-a022-448536e9cfab))
-    (pin "2" (uuid 07fde1a0-a51c-599b-aee0-911437968b75))
+    (pin "1" (uuid "9b01787e-0ed8-5dfd-a022-448536e9cfab"))
+    (pin "2" (uuid "07fde1a0-a51c-599b-aee0-911437968b75"))
     (instances (project
   "gcode"
   (path "/a679a91f-e4a1-51d4-bb2c-e3484a9c3111" (reference "C1") (unit 1))
@@ -333,36 +444,49 @@
     (lib_id "Device:R")
     (at 77.216 97.79 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid 43d6804b-f0e7-5dee-a29b-4e86c08abf2f)
+    (uuid "43d6804b-f0e7-5dee-a29b-4e86c08abf2f")
     (property
       "Reference"
       "R1"
       (at 77.216 97.79 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "1k"
       (at 77.216 102.87 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 77.216 105.41 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 77.216 107.95 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid 5ea035f6-b38a-5115-8605-a079300745cd))
-    (pin "2" (uuid 66b0a935-4b4d-5e03-a964-f4fee59eb331))
+    (pin "1" (uuid "5ea035f6-b38a-5115-8605-a079300745cd"))
+    (pin "2" (uuid "66b0a935-4b4d-5e03-a964-f4fee59eb331"))
     (instances (project
   "gcode"
   (path "/a679a91f-e4a1-51d4-bb2c-e3484a9c3111" (reference "R1") (unit 1))
@@ -372,37 +496,37 @@
     "GND"
     (at 77.216 66.04 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 482c8ada-8019-5ebd-8e5e-45fcc643aa75)
+    (uuid "482c8ada-8019-5ebd-8e5e-45fcc643aa75")
   )
   (label
     "GND"
     (at 78.232 83.82 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 47f08cf6-91e4-5aae-9302-b35a18dae589)
+    (uuid "47f08cf6-91e4-5aae-9302-b35a18dae589")
   )
   (label
     "IN"
     (at 77.216 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 8d8233dc-1e07-594b-8af5-db09a8a6df97)
+    (uuid "8d8233dc-1e07-594b-8af5-db09a8a6df97")
   )
   (label
     "IN"
     (at 77.216 93.98 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 3988d7f1-e45c-590e-9b7f-7d0dac2e7e05)
+    (uuid "3988d7f1-e45c-590e-9b7f-7d0dac2e7e05")
   )
   (label
     "OUT"
     (at 78.232 76.2 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 619073e4-e2a7-5232-b324-cd2ea0e68506)
+    (uuid "619073e4-e2a7-5232-b324-cd2ea0e68506")
   )
   (label
     "OUT"
     (at 77.216 101.6 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid dea73e4a-6a34-5d00-84cd-576a606f6204)
+    (uuid "dea73e4a-6a34-5d00-84cd-576a606f6204")
   )
   (sheet_instances (path "/" (page "1")))
 )

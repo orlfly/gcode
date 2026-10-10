@@ -103,6 +103,12 @@ fn generated_schematics_are_loadable_and_netlist_correct() {
     let mut checked = 0;
     for entry in catalog::all() {
         let report = generate_with_report(&entry.ir, Layout::default()).unwrap();
+        assert!(
+            report.missing_symbols.is_empty(),
+            "{}: fell back to the generic stub for {:?}; the netlist/ERC checks would be meaningless",
+            entry.id,
+            report.missing_symbols
+        );
         let path = dir.join(format!("{}.kicad_sch", entry.id));
         std::fs::write(&path, &report.content).unwrap();
 

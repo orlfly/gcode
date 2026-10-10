@@ -1,62 +1,85 @@
 (kicad_sch
-  (version 20230121)
-  (generator gcode)
-  (uuid 45a19d40-0518-514f-9147-75063d0a5bf2)
+  (version 20260306)
+  (generator "gcode")
+  (generator_version "10.0")
+  (uuid "45a19d40-0518-514f-9147-75063d0a5bf2")
   (paper "A4")
   (title_block (title "Gcode generated"))
   (lib_symbols
     (symbol
       "Device:C"
-      (pin_numbers hide)
+      (pin_numbers (hide yes))
       (pin_names (offset 0.254))
+      (exclude_from_sim no)
       (in_bom yes)
       (on_board yes)
+      (in_pos_files yes)
+      (duplicate_pin_numbers_are_jumpers no)
       (property
         "Reference"
         "C"
         (at 0.635 2.54 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)) (justify left))
       )
       (property
         "Value"
         "C"
         (at 0.635 -2.54 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)) (justify left))
       )
       (property
         "Footprint"
         ""
         (at 0.9652 -3.81 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Datasheet"
-        "~"
+        ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Description"
+        "Unpolarized capacitor"
+        (at 0 0 0)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_keywords"
         "cap capacitor"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property
-        "ki_description"
-        "Unpolarized capacitor"
-        (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_fp_filters"
         "C_*"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (symbol
         "C_0_1"
-        (polyline (pts (xy -2.032 -0.762) (xy 2.032 -0.762)) (stroke (width 0.508) (type default)) (fill (type none)))
         (polyline (pts (xy -2.032 0.762) (xy 2.032 0.762)) (stroke (width 0.508) (type default)) (fill (type none)))
+        (polyline (pts (xy -2.032 -0.762) (xy 2.032 -0.762)) (stroke (width 0.508) (type default)) (fill (type none)))
       )
       (symbol
         "C_1_1"
@@ -65,7 +88,7 @@
           line
           (at 0 3.81 270)
           (length 2.794)
-          (name "~" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
         )
         (pin
@@ -73,57 +96,80 @@
           line
           (at 0 -3.81 90)
           (length 2.794)
-          (name "~" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "2" (effects (font (size 1.27 1.27))))
         )
       )
+      (embedded_fonts no)
     )
     (symbol
       "Regulator_Linear:L7805"
       (pin_names (offset 0.254))
+      (exclude_from_sim no)
       (in_bom yes)
       (on_board yes)
+      (in_pos_files yes)
+      (duplicate_pin_numbers_are_jumpers no)
       (property
         "Reference"
         "U"
         (at -3.81 3.175 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)))
       )
       (property
         "Value"
         "L7805"
         (at 0 3.175 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)) (justify left))
       )
       (property
         "Footprint"
         ""
         (at 0.635 -3.81 0)
-        (effects (font (size 1.27 1.27) italic) (justify left) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27) (italic yes)) (justify left))
       )
       (property
         "Datasheet"
         "http://www.st.com/content/ccc/resource/technical/document/datasheet/41/4f/b3/b0/12/d4/47/88/CD00000444.pdf/files/CD00000444.pdf/jcr:content/translations/en.CD00000444.pdf"
         (at 0 -1.27 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Description"
+        "Positive 1.5A 35V Linear Regulator, Fixed Output 5V, TO-220/TO-263/TO-252"
+        (at 0 0 0)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_keywords"
         "Voltage Regulator 1.5A Positive"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property
-        "ki_description"
-        "Positive 1.5A 35V Linear Regulator, Fixed Output 5V, TO-220/TO-263/TO-252"
-        (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_fp_filters"
         "TO?252* TO?263* TO?220*"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (symbol
         "L7805_0_1"
@@ -156,49 +202,70 @@
           (number "3" (effects (font (size 1.27 1.27))))
         )
       )
+      (embedded_fonts no)
     )
     (symbol
       "power:PWR_FLAG"
-      (power)
-      (pin_numbers hide)
-      (pin_names (offset 0) hide)
+      (power global)
+      (pin_numbers (hide yes))
+      (pin_names (offset 0) (hide yes))
+      (exclude_from_sim no)
       (in_bom yes)
       (on_board yes)
+      (in_pos_files yes)
+      (duplicate_pin_numbers_are_jumpers no)
       (property
         "Reference"
         "#FLG"
         (at 0 1.905 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Value"
         "PWR_FLAG"
         (at 0 3.81 0)
+        (show_name no)
+        (do_not_autoplace no)
         (effects (font (size 1.27 1.27)))
       )
       (property
         "Footprint"
         ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "Datasheet"
-        "~"
+        ""
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
+      )
+      (property
+        "Description"
+        "Special symbol for telling ERC where power comes from"
+        (at 0 0 0)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (property
         "ki_keywords"
         "flag power"
         (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
-      )
-      (property
-        "ki_description"
-        "Special symbol for telling ERC where power comes from"
-        (at 0 0 0)
-        (effects (font (size 1.27 1.27)) hide)
+        (show_name no)
+        (do_not_autoplace no)
+        (hide yes)
+        (effects (font (size 1.27 1.27)))
       )
       (symbol
         "PWR_FLAG_0_0"
@@ -207,7 +274,7 @@
           line
           (at 0 0 90)
           (length 0)
-          (name "pwr" (effects (font (size 1.27 1.27))))
+          (name "" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
         )
       )
@@ -219,41 +286,57 @@
           (fill (type none))
         )
       )
+      (embedded_fonts no)
     )
   )
   (symbol
     (lib_id "power:PWR_FLAG")
     (at 77.216 53.34 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid acc9671a-e354-59fd-8863-980b45e20117)
+    (uuid "acc9671a-e354-59fd-8863-980b45e20117")
     (property
       "Reference"
       "#FLG1"
       (at 77.216 53.34 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "PWR_FLAG"
       (at 77.216 58.42 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 77.216 60.96 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 77.216 63.5 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid a36cda8e-ef05-5925-93ca-5a55dd5e56ad))
+    (pin "1" (uuid "a36cda8e-ef05-5925-93ca-5a55dd5e56ad"))
     (instances (project
   "gcode"
   (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "#FLG1") (unit 1))
@@ -263,35 +346,50 @@
     (lib_id "power:PWR_FLAG")
     (at 77.216 66.04 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid 6de89d92-455e-5a45-a156-653292ba1388)
+    (uuid "6de89d92-455e-5a45-a156-653292ba1388")
     (property
       "Reference"
       "#FLG2"
       (at 77.216 66.04 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "PWR_FLAG"
       (at 77.216 71.12 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 77.216 73.66 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 77.216 76.2 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid 6c656b1a-f529-5f15-a6b6-034f955d95d6))
+    (pin "1" (uuid "6c656b1a-f529-5f15-a6b6-034f955d95d6"))
     (instances (project
   "gcode"
   (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "#FLG2") (unit 1))
@@ -301,36 +399,49 @@
     (lib_id "Device:C")
     (at 78.232 80.01 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid ff20a7ae-f76c-5b77-b96d-1f100e5e8e9f)
+    (uuid "ff20a7ae-f76c-5b77-b96d-1f100e5e8e9f")
     (property
       "Reference"
       "C1"
       (at 78.232 80.01 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "100nF"
       (at 78.232 85.09 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 78.232 87.63 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 78.232 90.17 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid 9b01787e-0ed8-5dfd-a022-448536e9cfab))
-    (pin "2" (uuid 07fde1a0-a51c-599b-aee0-911437968b75))
+    (pin "1" (uuid "9b01787e-0ed8-5dfd-a022-448536e9cfab"))
+    (pin "2" (uuid "07fde1a0-a51c-599b-aee0-911437968b75"))
     (instances (project
   "gcode"
   (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "C1") (unit 1))
@@ -340,36 +451,49 @@
     (lib_id "Device:C")
     (at 78.232 97.79 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid 0ed85e4b-ebc9-5a11-8025-b170443f2aba)
+    (uuid "0ed85e4b-ebc9-5a11-8025-b170443f2aba")
     (property
       "Reference"
       "C2"
       (at 78.232 97.79 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "100nF"
       (at 78.232 102.87 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 78.232 105.41 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 78.232 107.95 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid b3f526f7-5a3a-577c-a66c-c4709dc1be4a))
-    (pin "2" (uuid 1b98678f-a0cb-53a0-ab3f-3d44ddf3411f))
+    (pin "1" (uuid "b3f526f7-5a3a-577c-a66c-c4709dc1be4a"))
+    (pin "2" (uuid "1b98678f-a0cb-53a0-ab3f-3d44ddf3411f"))
     (instances (project
   "gcode"
   (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "C2") (unit 1))
@@ -379,37 +503,50 @@
     (lib_id "Regulator_Linear:L7805")
     (at 83.82 113.665 0)
     (unit 1)
+    (body_style 1)
+    (exclude_from_sim no)
     (in_bom yes)
     (on_board yes)
+    (in_pos_files yes)
     (dnp no)
-    (uuid efb0ec6a-afb0-5953-a27d-c97b27883a7e)
+    (uuid "efb0ec6a-afb0-5953-a27d-c97b27883a7e")
     (property
       "Reference"
       "U1"
       (at 83.82 113.665 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Value"
       "L7805"
       (at 83.82 118.745 0)
+      (show_name no)
+      (do_not_autoplace no)
       (effects (font (size 1.27 1.27)))
     )
     (property
       "Footprint"
       ""
       (at 83.82 121.285 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
     (property
       "Datasheet"
       ""
       (at 83.82 123.825 0)
-      (effects (font (size 1.27 1.27)) hide)
+      (hide yes)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)))
     )
-    (pin "1" (uuid fc6277d7-e7a9-5716-893a-4ccc0c88babc))
-    (pin "2" (uuid ace23088-3a4d-5f30-8984-8e8c90268229))
-    (pin "3" (uuid e991318f-ce53-5975-beb1-dfe4a0cd068f))
+    (pin "1" (uuid "fc6277d7-e7a9-5716-893a-4ccc0c88babc"))
+    (pin "2" (uuid "ace23088-3a4d-5f30-8984-8e8c90268229"))
+    (pin "3" (uuid "e991318f-ce53-5975-beb1-dfe4a0cd068f"))
     (instances (project
   "gcode"
   (path "/45a19d40-0518-514f-9147-75063d0a5bf2" (reference "U1") (unit 1))
@@ -419,55 +556,55 @@
     "GND"
     (at 77.216 66.04 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 482c8ada-8019-5ebd-8e5e-45fcc643aa75)
+    (uuid "482c8ada-8019-5ebd-8e5e-45fcc643aa75")
   )
   (label
     "GND"
     (at 78.232 83.82 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 47f08cf6-91e4-5aae-9302-b35a18dae589)
+    (uuid "47f08cf6-91e4-5aae-9302-b35a18dae589")
   )
   (label
     "GND"
     (at 78.232 101.6 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 5701450f-9cd1-5d86-a284-986f327e766d)
+    (uuid "5701450f-9cd1-5d86-a284-986f327e766d")
   )
   (label
     "GND"
     (at 83.82 121.285 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 8a14ecf2-6daf-5951-ab0a-9241097dfca5)
+    (uuid "8a14ecf2-6daf-5951-ab0a-9241097dfca5")
   )
   (label
     "VIN"
     (at 77.216 53.34 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 217d3b48-5c4c-5668-9bc2-99fc484e7982)
+    (uuid "217d3b48-5c4c-5668-9bc2-99fc484e7982")
   )
   (label
     "VIN"
     (at 78.232 76.2 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid c78124b6-e6d6-5c8f-a5af-a9bf6adc6e21)
+    (uuid "c78124b6-e6d6-5c8f-a5af-a9bf6adc6e21")
   )
   (label
     "VIN"
     (at 76.2 113.665 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid ead0a653-f7db-536b-a35c-85edf1b11dbb)
+    (uuid "ead0a653-f7db-536b-a35c-85edf1b11dbb")
   )
   (label
     "VOUT"
     (at 78.232 93.98 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 3e4e79c6-c831-588a-93b8-e2a3af514d62)
+    (uuid "3e4e79c6-c831-588a-93b8-e2a3af514d62")
   )
   (label
     "VOUT"
     (at 91.44 113.665 0)
     (effects (font (size 1.27 1.27)) (justify left bottom))
-    (uuid 2dd8652e-6e45-5b4c-994b-cd9f53a344b4)
+    (uuid "2dd8652e-6e45-5b4c-994b-cd9f53a344b4")
   )
   (sheet_instances (path "/" (page "1")))
 )

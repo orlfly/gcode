@@ -289,7 +289,7 @@ fn mosfet_switch() -> CircuitEntry {
         expectation: "Gate driven via 10k, 100k pulldown; LED load in drain path",
         ir: NetlistIr::new(
             vec![
-                Component::new("Q1", "Device:Q_NMOS_GSD", "Q_NMOS_GSD"),
+                Component::new("Q1", "Device:Q_NMOS", "Q_NMOS"),
                 Component::new("R1", "Device:R", "10k"),
                 Component::new("R2", "Device:R", "100k"),
                 Component::new("R3", "Device:R", "330"),
@@ -299,13 +299,13 @@ fn mosfet_switch() -> CircuitEntry {
                 power_flag(FLG3),
             ],
             vec![
-                // Q_NMOS_GSD pins: 1=G, 2=S, 3=D
+                // Device:Q_NMOS pin numbers are letters: D=drain, G=gate, S=source.
                 Net::new("IN", &[("R1", "1"), (FLG1, "1")]),
-                Net::new("GATE", &[("R1", "2"), ("Q1", "1"), ("R2", "1")]),
-                Net::new("GND", &[("R2", "2"), ("Q1", "2"), (FLG2, "1")]),
+                Net::new("GATE", &[("R1", "2"), ("Q1", "G"), ("R2", "1")]),
+                Net::new("GND", &[("R2", "2"), ("Q1", "S"), (FLG2, "1")]),
                 Net::new("VCC", &[("R3", "1"), (FLG3, "1")]),
                 Net::new("LED_A", &[("R3", "2"), ("D1", "2")]),
-                Net::new("DRAIN", &[("D1", "1"), ("Q1", "3")]),
+                Net::new("DRAIN", &[("D1", "1"), ("Q1", "D")]),
             ],
         ),
     }
@@ -403,5 +403,69 @@ mod tests {
         assert_eq!(by_id("voltage-divider").unwrap().title, "电阻分压器");
         assert!(by_id("nope").is_none());
         assert_eq!(count(), 10);
+    }
+
+    /// Guard against KiCad library drift: every symbol the catalog names must
+    /// exist in the installed library, otherwise generation silently falls back
+    /// to the generic stub and ERC results become meaningless.
+    #[test]
+    fn every_catalog_symbol_resolves_in_the_local_library() {
+        let mut lib = crate::symbols::SymbolLibrary::locate();
+        if lib.dir().is_none() {
+            eprintln!("skip: no KiCad symbol library");
+            return;
+        }
+        for entry in all() {
+            let ids: std::collections::BTreeSet<&str> =
+                entry.ir.components.iter().map(|c| c.lib_id.as_str()).collect();
+            for lib_id in ids {
+                assert!(
+                    lib.symbol(lib_id).is_some(),
+                    "{}: {} is not in the local KiCad symbol library",
+                    entry.id,
+                    lib_id
+                );
+            }
+        }
+    }
+
+    /// Guard against pin-number drift (e.g. `Q_NMOS_GSD` with pins 1/2/3 being
+    /// replaced by `Q_NMOS` with pins D/G/S): every referenced pin must exist on
+    /// the symbol, or the connection is dropped at generation time.
+    #[test]
+    fn every_catalog_pin_exists_on_its_symbol() {
+        let mut lib = crate::symbols::SymbolLibrary::locate();
+        if lib.dir().is_none() {
+            eprintln!("skip: no KiCad symbol library");
+            return;
+        }
+        for entry in all() {
+            for c in &entry.ir.components {
+                let Some(sym) = lib.symbol(&c.lib_id) else {
+                    continue; // covered by the resolves test
+                };
+                let known: std::collections::BTreeSet<String> = crate::symbols::pins_of(&sym)
+                    .into_iter()
+                    .map(|p| p.number)
+                    .collect();
+                for net in &entry.ir.nets {
+                    for (reference, pin) in &net.connections {
+                        if reference != &c.reference {
+                            continue;
+                        }
+                        assert!(
+                            known.contains(pin),
+                            "{}: net {} references {}.{}, but {} only has pins {:?}",
+                            entry.id,
+                            net.name,
+                            c.reference,
+                            pin,
+                            c.lib_id,
+                            known
+                        );
+                    }
+                }
+            }
+        }
     }
 }

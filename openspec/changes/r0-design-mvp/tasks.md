@@ -5,9 +5,9 @@
 
 ## 1. 环境与前置验证
 
-- [ ] 1.1 安装 KiCad 10：**阻塞**。本机已有 KiCad 7.0.11（`/usr/bin/kicad-cli`，无 `sch erc`）；升级需 sudo 密码（不可交互）或 flatpak 用户级安装（已后台启动下载，见 `$JCODE_SCRATCH_DIR/r0/install.log`）
-- [ ] 1.2 headless ERC 跑通：**阻塞**于 1.1（KiCad 7 无 ERC 子命令）。已用手写最小原理图验证 kicad-cli 可加载，并确认 ERC 报告 JSON 结构（用于解析层测试夹具）
-- [x] 1.3 生成物可被真实 kicad-cli 识别 + 格式 token 回填：**完成**。10/10 电路可被 `kicad-cli sch export netlist` 读取，且网表与 IR 逐条一致；格式 token 定为 `20230121`（KiCad 7）——后续版本均可读，验证方式见 `tests/kicad_integration.rs`
+- [x] 1.1 安装 KiCad 10：**完成**。已升级到 **KiCad 10.0.7**（`/usr/bin/kicad-cli`），含 `sch erc` 子命令。
+- [x] 1.2 headless ERC 跑通：**完成**。`kicad-cli sch erc --format json` 在 10 类电路上全部可跑，**ERC 10/10 PASS**；JSON 报告（`violations` / `unconnected_items` / `schematic_parity`）已用于解读层测试夹具。
+- [x] 1.3 生成物可被真实 kicad-cli 识别 + 格式 token 回填：**完成**。10/10 电路可被 `kicad-cli sch export netlist` 读取，且网表与 IR 逐条一致；文档格式 token 已跟到 KiCad 10 实际写出值 **`20260306`**（`generator_version 10.0`，uuid 用带引号字符串），验证方式见 `tests/kicad_integration.rs`
 - [x] 1.4 s-expression 覆盖率实测：**完成**。自研解析器在 **309/309 个真实 KiCad 文件（100%，190 MiB，demos+symbols+footprints）** 上全部解析成功（`tests/parser_coverage.rs`）
 - [x] 1.5 PRD 验证清单回填：**完成**，见 `docs/PRD-gcode.md` 附二
 
@@ -73,6 +73,14 @@
 
 ## 本轮未能闭环的项（需外部条件）
 
-1. **KiCad ≥ 10 的 ERC 实测**：需要 sudo 或 flatpak 安装完成；这是 KR1 判定的唯一阻塞。
-2. **NL → 网表 的真实成功率**：需要在配置了 provider 的 agent 会话里跑 10 条自然语言描述。
-3. **ngspice**：R1 范围，未开始。
+1. **NL → 网表 的真实成功率**：需要在配置了 provider 的 agent 会话里跑 10 条自然语言描述
+   （本轮的 10/10 是「参考实现 + 确定性链路 + ERC」的成绩，不代表 NL 理解率）。
+2. **ngspice**：R1 范围，未开始。
+
+## 升级 KiCad 10 时发现的真实问题（已修复）
+
+- KiCad 10 的 `Device:Q_NMOS_GSD` **已不存在**，替代品是 `Device:Q_NMOS`，且**引脚号从数字变成字母**
+  （`D`/`G`/`S`）。旧写法导致生成器静默回退到两脚通用 stub，而 stub 恰好让 ERC 报 PASS——
+  **一个假通过**。修复：catalog 改用 `Device:Q_NMOS` + `D/G/S`，并新增两道护栏测试：
+  「所有 lib_id 必须能在本地库解析」与「所有引用引脚必须存在于符号」。
+  验收脚本同时把「回退 stub」列为不可接受状态（exit 4），使这类假通过无法再蒙过 KR1。

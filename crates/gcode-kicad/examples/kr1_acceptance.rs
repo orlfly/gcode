@@ -38,6 +38,8 @@ struct Row {
     components: usize,
     nets: usize,
     generated: bool,
+    /// False when the run had to fall back to the generic stub for any symbol.
+    symbols_resolved: bool,
     kicad_loadable: Option<bool>,
     netlist_correct: Option<bool>,
     erc: ErcState,
@@ -71,11 +73,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut notes = Vec::new();
         let report = generate_with_report(&entry.ir, Layout::default())?;
         let generated = !report.content.is_empty() && entry.ir.validate().is_ok();
+        let symbols_resolved = report.missing_symbols.is_empty();
         if !report.warnings.is_empty() {
             notes.push(format!("生成警告 {} 条", report.warnings.len()));
         }
-        if !report.missing_symbols.is_empty() {
-            notes.push(format!("缺失符号 {:?}", report.missing_symbols));
+        if !symbols_resolved {
+            // A stub substitution silently changes pin semantics, so ERC cannot
+            // be trusted for this circuit. It must not count as accepted.
+            notes.push(format!(
+                "符号缺失 {:?} → 已回退通用符号，该电路的 ERC 结果不可信",
+                report.missing_symbols
+            ));
         }
 
         let path = workdir.join(format!("{}.kicad_sch", entry.id));
@@ -117,6 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             components: entry.ir.components.len(),
             nets: entry.ir.nets.len(),
             generated,
+            symbols_resolved,
             kicad_loadable: loadable,
             netlist_correct: correct,
             erc,
@@ -143,6 +152,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     if cli_ok && net_ok < rows.len() {
         std::process::exit(3);
+    }
+    let sym_ok = rows.iter().filter(|r| r.symbols_resolved).count();
+    if sym_ok < rows.len() {
+        std::process::exit(4);
     }
     Ok(())
 }
@@ -239,6 +252,12 @@ fn expected_nets(ir: &gcode_kicad::NetlistIr) -> BTreeMap<String, BTreeSet<(Stri
 fn render(rows: &[Row], cli_ok: bool) -> String {
     let gen_ok = rows.iter().filter(|r| r.generated).count();
     let net_ok = rows.iter().filter(|r| r.netlist_correct == Some(true)).count();
+    // A circuit only counts if the pins are the real ones *and* it passed ERC.
+    let accepted = |r: &Row| {
+        r.generated && r.symbols_resolved && r.netlist_correct != Some(false) && r.erc == ErcState::Clean
+    };
+    let accepted_n = rows.iter().filter(|r| accepted(r)).count();
+    let sym_ok = rows.iter().filter(|r| r.symbols_resolved).count();
     let erc_measured: Vec<&Row> = rows
         .iter()
         .filter(|r| matches!(r.erc, ErcState::Clean | ErcState::Violations(_)))
@@ -285,10 +304,18 @@ fn render(rows: &[Row], cli_ok: bool) -> String {
             erc_measured.len()
         ));
     }
-    md.push_str("| ④ NL → 网表（需要 LLM provider） | 本脚本不执行；由 agent 会话产生 |\n\n");
+    md.push_str(&format!(
+        "| ④ 符号解析（未回退通用 stub） | **{sym_ok}/{}** |\n",
+        rows.len()
+    ));
+    md.push_str("| ⑤ NL → 网表（需要 LLM provider） | 本脚本不执行；由 agent 会话产生 |\n\n");
+    md.push_str(&format!(
+        "**KR1 判定（①②③④ 全部满足的电路数）**：**{accepted_n}/{}**（目标 ≥ 7）\n\n",
+        rows.len()
+    ));
 
     md.push_str("## 逐电路结果\n\n");
-    md.push_str("| 电路 | 元件/网络 | 生成 | KiCad 可读 | 网表一致 | ERC |\n|---|---|---|---|---|---|\n");
+    md.push_str("| 电路 | 元件/网络 | 生成 | 符号解析 | KiCad 可读 | 网表一致 | ERC | 接受 |\n|---|---|---|---|---|---|---|---|\n");
     for r in rows {
         let yn = |b: Option<bool>| match b {
             Some(true) => "✓",
@@ -301,15 +328,17 @@ fn render(rows: &[Row], cli_ok: bool) -> String {
             ErcState::Unavailable(_) => "未测".to_string(),
         };
         md.push_str(&format!(
-            "| {} ({}) | {}/{} | {} | {} | {} | {} |\n",
+            "| {} ({}) | {}/{} | {} | {} | {} | {} | {} | {} |\n",
             r.title,
             r.id,
             r.components,
             r.nets,
             if r.generated { "✓" } else { "✗" },
+            yn(Some(r.symbols_resolved)),
             yn(r.kicad_loadable),
             yn(r.netlist_correct),
-            erc
+            erc,
+            if accepted(r) { "✓" } else { "✗" }
         ));
     }
 
@@ -326,21 +355,20 @@ fn render(rows: &[Row], cli_ok: bool) -> String {
 
     md.push_str("\n## 结论与遗留\n\n");
     if erc_measured.is_empty() {
-        md.push_str("- ✅ ①② 轨道全绿：10 类电路都能确定性生成，并被真实 kicad-cli 正确读出网表。\n");
-        md.push_str("- ⚠️ **KR1 尚未判定**：本机 kicad-cli 版本不支持 `sch erc`，");
-        md.push_str("ERC 轨道无法测量，因此不能说 KR1 达标。\n");
-        md.push_str("- 遗留：安装 KiCad ≥ 10（ERC 版本门控的最低版本，可用 `GCODE_KICAD_MIN_VERSION` 覆盖）后重跑本脚本。\n");
-        md.push_str("- 遗留：NL → 网表 轨道需要在配置了 provider 的 agent 会话里跑 10 条自然语言描述。\n");
-    } else if erc_ok * 10 >= 7 * erc_measured.len() {
+        md.push_str("- ⚠️ **KR1 尚未判定**：kicad-cli 不支持 `sch erc`，ERC 轨道无法测量。\n");
+        md.push_str("- 遗留：安装 KiCad ≥ 10 后重跑本脚本。\n");
+    } else if accepted_n * 10 >= 7 * rows.len() {
         md.push_str(&format!(
-            "- ✅ KR1 达标：ERC 轨道 {erc_ok}/{} ≥ 7/10。\n",
-            erc_measured.len()
+            "- ✅ **KR1 达标**：①生成 + ②符号解析 + ③KiCad 网表一致 + ④ERC PASS 全满足 {accepted_n}/{} ≥ 7/10。\n",
+            rows.len()
         ));
+        md.push_str("- 说明：ERC 由 kicad-cli 判定；符号必须来自真实库（回退 stub 的电路不计入）。\n");
     } else {
         md.push_str(&format!(
-            "- ❌ KR1 未达标：ERC 轨道 {erc_ok}/{} < 7/10，需回到生成/ERC 迭代。\n",
-            erc_measured.len()
+            "- ❌ **KR1 未达标**：全满足的电路 {accepted_n}/{} < 7/10，需回到生成/ERC 迭代。\n",
+            rows.len()
         ));
     }
+    md.push_str("- 遗留：NL → 网表 轨道需要在配置了 provider 的 agent 会话里跑 10 条自然语言描述（本脚本只覆盖确定性半段）。\n");
     md
 }
