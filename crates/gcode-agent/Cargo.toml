@@ -15,3 +15,4 @@ jcode = { workspace = true }
 anyhow = { workspace = true }
 tokio = { workspace = true }
 crossterm = "0.29"
+dirs = "5"
