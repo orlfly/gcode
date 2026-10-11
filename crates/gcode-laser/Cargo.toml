@@ -1,0 +1,14 @@
+[package]
+name = "gcode-laser"
+version = "0.1.0"
+edition = "2024"
+description = "Gerber/Excellon to GRBL laser G-code for the Gcode agent: isolation routing, drill marks, board outline, SVG preview"
+
+[lib]
+name = "gcode_laser"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
