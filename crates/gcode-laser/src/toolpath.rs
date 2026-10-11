@@ -350,6 +350,10 @@ pub fn build_job(inputs: JobInputs<'_>) -> Result<LaserJob, JobError> {
             warnings.push("铜层解析后没有得到任何走刀，请检查文件内容".into());
         }
         notes.push(format!("隔离雕刻：{} 条闭合路径", paths.len()));
+        notes.push(format!(
+            "隔离遍数 {} = 同一条路径重复走（用于逐遍加深切缝）；要加宽隔离缝请增大安全间距（当前 {:.3}mm）",
+            inputs.isolation_profile.passes, inputs.isolation.clearance
+        ));
         raw_isolation = paths;
         clearance = Some(check);
     } else {

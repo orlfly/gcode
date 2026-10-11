@@ -99,7 +99,8 @@ pub fn profiles() -> Vec<LaserProfile> {
             speed_mm_min: 200,
             passes: 6,
             applicability: "二极管激光（~2.5W 光功率，405/445nm）隔离雕刻常见起点；\
-                            用 0.1mm 刀距、0.2mm 安全间距做首次试刻"
+                            多遍 = 同一条路径重复走（逐遍加深切缝），要加宽隔离缝请增大 clearance\
+                            而不是加遍数；首次务必在废料上试刻"
                 .into(),
             source: "社区常见做法（无厂商数据）；未在本机验证".into(),
         },
