@@ -2347,6 +2347,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "gcode-instrument"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "gcode-kicad",
+ "gcode-sim",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tokio",
+]
+
+[[package]]
 name = "gcode-kicad"
 version = "0.1.0"
 dependencies = [

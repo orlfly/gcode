@@ -1,0 +1,21 @@
+[package]
+name = "gcode-instrument"
+version = "0.1.0"
+edition = "2024"
+description = "Measurement instrument HAL for the Gcode agent: safety gate, test plans, sim-vs-measured comparison"
+
+[lib]
+name = "gcode_instrument"
+path = "src/lib.rs"
+
+[dependencies]
+gcode-kicad = { workspace = true }
+gcode-sim = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+async-trait = { workspace = true }
+tokio = { version = "1", features = ["process", "fs", "rt", "time", "macros", "io-util"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
