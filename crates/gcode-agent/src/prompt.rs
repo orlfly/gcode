@@ -19,6 +19,9 @@ KiCad GUI 打开文件查看。
 - `gcode_list_sim_recipes` —— 查看每个电路可做的仿真（分析类型、探针、解析预期值与容差）
 - `gcode_run_simulation` —— 跑 ngspice 仿真，拿到实测指标、PASS/FAIL 与波形/图形产物路径
 - `gcode_check_sim_toolchain` —— 查看 ngspice 是否可用
+- `gcode_list_instruments` —— 查看本机可用的测量后端（虚拟台/sigrok/串口电源）与硬性安全上限
+- `gcode_plan_test` —— 生成测试计划（预期值必须来自仿真基准或用户显式输入）
+- `gcode_run_test` —— 执行测试并返回 PASS/FAIL 报告（带电步骤必须用户确认）
 
 **绝对不要**手写或编辑 `.kicad_sch`（s-expression）。所有改动都必须经过网表 IR。
 
@@ -72,6 +75,23 @@ KiCad GUI 打开文件查看。
   验证的是拓扑与量级正确性，**不是**器件级精度。涉及精度时必须说明这一点。
 - ERC 只做电气规则检查，不做数值仿真；两者都要跑才算完整验证。
 
+# 实测（R1.5）
+- **测量值不得编造**：所有实测数字必须来自 `gcode_run_test` 返回的仪器读数。
+  绝对不要把仿真值、估算值或「应该是」的数值说成实测结果。
+- 流程：`gcode_list_instruments` 看有什么设备 → `gcode_plan_test` 生成计划
+  （用 `circuit_id` 让预期值取自仿真基准，或自己给带预期值的步骤）→
+  `gcode_run_test` 执行。
+- **带电必须确认（硬性）**：任何要给板子上电的步骤都需要用户当轮明确同意。
+  没有确认时 `gcode_run_test` 会拒绝执行带电步骤并说明原因 —— 这是预期行为，
+  此时先把计划里的电压/限流告诉用户并征求同意，再以 `user_confirmed=true` 重试。
+  另外本会话还需 `GCODE_ALLOW_SOURCE=1` 才允许上电（默认关闭）。
+- **安全上限（硬性，无法绕过）**：电压 ≤ 48V DC、电流 ≤ 5A；读到超过预期 2 倍的电流会
+  立即断电并终止测试。市电/高压、大电流功率测试不在支持范围内。
+- 报告里会标注数据来源；若来源是虚拟仪器或 sigrok `demo` 设备，会明确标为**合成数据**，
+  此时**不得**把它当作真实板卡的结论。
+- 与仿真的关系：`gcode_plan_test` 可从仿真配方取预期值，`gcode_run_test` 的结果就是
+  KR2（仿真 vs 实测）判定的依据：直流偏差 ≤10%、AC 峰值频率偏差 ≤20%。
+
 # 修改已有设计
 用 `gcode_read_schematic` 先读回真实内容，再基于它构造新网表，然后用
 `gcode_apply_edit`（先 `confirm=false` 拿 diff → 展示给用户 → 得到确认后用
@@ -116,6 +136,9 @@ mod tests {
             "gcode_list_sim_recipes",
             "gcode_run_simulation",
             "gcode_check_sim_toolchain",
+            "gcode_list_instruments",
+            "gcode_plan_test",
+            "gcode_run_test",
         ] {
             assert!(GCODE_SYSTEM_PROMPT.contains(tool), "missing tool {tool}");
         }
@@ -129,6 +152,19 @@ mod tests {
         // The fidelity caveat must be stated, not hidden.
         assert!(GCODE_SYSTEM_PROMPT.contains("行为级 macromodel"));
         assert!(GCODE_SYSTEM_PROMPT.contains("不是**器件级精度") || GCODE_SYSTEM_PROMPT.contains("不是"));
+    }
+
+    #[test]
+    fn prompt_forbids_fabricated_measurements() {
+        assert!(GCODE_SYSTEM_PROMPT.contains("测量值不得编造"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("gcode_run_test"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("gcode_plan_test"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("gcode_list_instruments"));
+        // Charged operations must be explicitly confirmed, and synthetic data
+        // must not be presented as a board result.
+        assert!(GCODE_SYSTEM_PROMPT.contains("带电必须确认"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("合成数据"));
+        assert!(GCODE_SYSTEM_PROMPT.contains("GCODE_ALLOW_SOURCE"));
     }
 
     #[test]

@@ -11,6 +11,7 @@ path = "src/main.rs"
 [dependencies]
 gcode-kicad = { workspace = true }
 gcode-sim = { workspace = true }
+gcode-instrument = { workspace = true }
 gcode-tools = { workspace = true }
 jcode = { workspace = true }
 anyhow = { workspace = true }

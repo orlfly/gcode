@@ -1,0 +1,42 @@
+{
+  "plan_id": "tp-a-passive",
+  "items": [
+    {
+      "step": 1,
+      "target": "VOUT（无源测量）",
+      "expected": {
+        "value": 2.4489795918367347,
+        "tol": 0.02448979591836735,
+        "tol_pct": 1.0,
+        "unit": "V",
+        "source": "仿真基准（voltage-divider / VOUT / op）"
+      },
+      "measured": 2.4489795918367347,
+      "unit": "V",
+      "verdict": "PASS",
+      "deviation": 0.0,
+      "deviation_pct": 0.0,
+      "measurement_source": "非真实测量（合成数据，来源 virtual:virtual)",
+      "synthetic": true,
+      "tolerance_pct": 1.0,
+      "tolerance_source": "步骤自带容差"
+    }
+  ],
+  "summary": "1/1 PASS",
+  "passed": 1,
+  "failed": 0,
+  "rejected": 0,
+  "not_comparable": 0,
+  "overall": "PASS",
+  "events": [
+    "测量仪器 virtual:virtual（也可作为源）",
+    "上电通道 virtual:virtual",
+    "本次运行未携带用户确认令牌：带电步骤将被拒绝",
+    "测量仪器 virtual:virtual（也可作为源）",
+    "上电通道 virtual:virtual",
+    "步骤 2：已上电 5V / 限流 0.2A",
+    "步骤 2：实测电流 0.004 A（预期 0.02 A，熔断阈值 0.04 A）",
+    "运行结束：已关闭电源输出"
+  ],
+  "notes": []
+}

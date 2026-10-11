@@ -1,0 +1,19 @@
+测试报告 tp-a-passive：PASS（1/1 PASS）
+
+- [PASS] 步骤 1 · VOUT（无源测量）
+    实测 2.44898 V
+    预期 2.44898 V（±1%，步骤自带容差）
+    依据 仿真基准（voltage-divider / VOUT / op）
+    偏差 +0.00%
+    数据来源 非真实测量（合成数据，来源 virtual:virtual)
+事件：
+- 测量仪器 virtual:virtual（也可作为源）
+- 上电通道 virtual:virtual
+- 本次运行未携带用户确认令牌：带电步骤将被拒绝
+- 测量仪器 virtual:virtual（也可作为源）
+- 上电通道 virtual:virtual
+- 步骤 2：已上电 5V / 限流 0.2A
+- 步骤 2：实测电流 0.004 A（预期 0.02 A，熔断阈值 0.04 A）
+- 运行结束：已关闭电源输出
+
+⚠️ 本报告包含**合成数据**（虚拟仪器或 sigrok demo 设备），不能作为真实板卡的测量结论。

@@ -45,6 +45,17 @@ impl<'a> Executor<'a> {
         &self.policy
     }
 
+    /// The instrument used to energise the board: an explicit supply if given,
+    /// otherwise the meter itself when it is source-capable (a virtual bench or
+    /// an SMU can do both).
+    fn effective_supply(&self) -> Option<&'a dyn Instrument> {
+        match self.supply {
+            Some(s) => Some(s),
+            None if self.meter.capabilities().can_source => Some(self.meter),
+            None => None,
+        }
+    }
+
     /// Execute the plan and return a report.
     pub async fn run(&self, plan: &TestPlan, auth: Option<&ConfirmToken>) -> TestReport {
         let mut events: Vec<String> = Vec::new();
@@ -62,9 +73,9 @@ impl<'a> Executor<'a> {
                 "仅测量"
             }
         ));
-        match self.supply {
-            Some(s) => events.push(format!("可编程电源 {}", s.id())),
-            None => events.push("未提供可编程电源：需要上电的步骤将被拒绝".into()),
+        match self.effective_supply() {
+            Some(s) => events.push(format!("上电通道 {}", s.id())),
+            None => events.push("没有可上电的通道：需要上电的步骤将被拒绝".into()),
         }
         if auth.is_none() {
             events.push("本次运行未携带用户确认令牌：带电步骤将被拒绝".into());
@@ -81,7 +92,7 @@ impl<'a> Executor<'a> {
 
             // Steps that need power: energise first, and refuse if we cannot.
             if step.needs_power() {
-                let Some(supply) = self.supply else {
+                let Some(supply) = self.effective_supply() else {
                     rejected.insert(
                         step.index,
                         "该步骤需要给板子上电，但没有可编程电源（设置 GCODE_PSU_PORT）".to_string(),
@@ -182,7 +193,7 @@ impl<'a> Executor<'a> {
         }
 
         // Always leave the supply off.
-        if let Some(supply) = self.supply {
+        if let Some(supply) = self.effective_supply() {
             if !energised.is_empty() || fused {
                 let off = SourceRequest {
                     voltage: None,
@@ -430,6 +441,7 @@ mod tests {
 
     #[tokio::test]
     async fn without_a_supply_powered_steps_are_rejected() {
+        // FixedMeter cannot source, and no supply is given.
         let meter = FixedMeter {
             voltage: 3.3,
             current: 0.01,
@@ -441,7 +453,7 @@ mod tests {
             .analysis
             .as_ref()
             .unwrap()
-            .contains("没有可编程电源"));
+            .contains("需要给板子上电"));
     }
 
     #[tokio::test]

@@ -2339,6 +2339,7 @@ dependencies = [
  "anyhow",
  "crossterm",
  "dirs",
+ "gcode-instrument",
  "gcode-kicad",
  "gcode-sim",
  "gcode-tools",
@@ -2388,6 +2389,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
+ "gcode-instrument",
  "gcode-kicad",
  "gcode-sim",
  "jcode",

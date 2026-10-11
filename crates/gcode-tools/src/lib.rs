@@ -721,6 +721,357 @@ fn render_outcome(o: &recipes::SimOutcome, recipe: &recipes::SimRecipe) -> Strin
     out
 }
 
+/// Tool: list measurement instruments and their capabilities.
+pub struct ListInstrumentsTool;
+
+#[async_trait]
+impl Tool for ListInstrumentsTool {
+    fn name(&self) -> &str {
+        "gcode_list_instruments"
+    }
+
+    fn description(&self) -> &str {
+        "List the measurement backends available on this machine (virtual bench, sigrok-cli, serial \
+         programmable supply), each with a reason when it is unavailable, plus what quantities each \
+         can measure. Run this before planning a test."
+    }
+
+    fn parameters_schema(&self) -> Value {
+        serde_json::json!({"type": "object", "properties": {}})
+    }
+
+    async fn execute(&self, _input: Value, _ctx: ToolContext) -> anyhow::Result<ToolOutput> {
+        let mut out = String::from("测量后端：\n");
+        for s in gcode_instrument::probe_backends().await {
+            out.push_str(&format!("- {}\n", s.describe()));
+        }
+        out.push_str("\n安全约束（硬性）：电压 ≤ 48V DC、电流 ≤ 5A；上电需要用户当轮确认；\n");
+        out.push_str(&format!(
+            "上电通道默认关闭（需 {} =1），且读到超过预期 2 倍的电流会立即断电。\n",
+            gcode_instrument::hal::ALLOW_SOURCE_ENV
+        ));
+        match gcode_instrument::hal::source_enabled() {
+            true => out.push_str("当前会话：允许上电。\n"),
+            false => out.push_str("当前会话：不允许上电（带电步骤会被拒绝）。\n"),
+        }
+        Ok(ToolOutput::new(out))
+    }
+}
+
+/// Tool: build a measurement test plan.
+pub struct PlanTestTool;
+
+#[async_trait]
+impl Tool for PlanTestTool {
+    fn name(&self) -> &str {
+        "gcode_plan_test"
+    }
+
+    fn description(&self) -> &str {
+        "Build a measurement test plan. Either derive it from a catalog circuit's simulation recipe \
+         (circuit_id) so the expected values are simulation baselines, or supply your own steps with \
+         explicit expected values. A plan with steps that have no expected value is refused: pass \
+         criteria must never be invented."
+    }
+
+    fn parameters_schema(&self) -> Value {
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "circuit_id": {"type": "string", "description": "Catalog circuit to derive the plan from"},
+                "recipe": {"type": "string", "description": "Recipe name when the circuit has several"},
+                "plan_id": {"type": "string", "description": "Plan id (default derived from the circuit)"},
+                "steps": {
+                    "type": "array",
+                    "description": "Explicit steps: [{target, quantity, expected_value, tol_pct, unit, rationale, powered_voltage?, current_limit?}]"
+                },
+                "out_dir": {"type": "string", "description": "Where to write the plan JSON"}
+            }
+        })
+    }
+
+    async fn execute(&self, input: Value, ctx: ToolContext) -> anyhow::Result<ToolOutput> {
+        let plan = match build_plan(&input) {
+            Ok(p) => p,
+            Err(e) => return Ok(ToolOutput::new(format!("无法生成测试计划：{e}"))),
+        };
+        let json = match plan.to_json() {
+            Ok(j) => j,
+            Err(e) => return Ok(ToolOutput::new(format!("计划无法序列化：{e}"))),
+        };
+
+        let mut out = format!(
+            "测试计划 {}：{} 个步骤（其中 {} 个需要上电）\n",
+            plan.plan_id,
+            plan.steps.len(),
+            plan.powered_steps().len()
+        );
+        for s in &plan.steps {
+            out.push_str(&format!(
+                "\n- 步骤 {} · {}：{} {}（±{}%），预期依据 {}，{}",
+                s.index,
+                s.target,
+                s.quantity.label_zh(),
+                s.expected.value,
+                s.expected.tol_pct,
+                s.expected.source.describe(),
+                if s.needs_power() { "需要上电" } else { "无需上电" }
+            ));
+        }
+        for n in &plan.notes {
+            out.push_str(&format!("\n说明：{n}"));
+        }
+        out.push_str(&format!("\n\n计划 JSON：\n{json}"));
+
+        if let Some(dir) = input.get("out_dir").and_then(|v| v.as_str()) {
+            let abs = ctx.resolve_path(Path::new(dir));
+            let path = abs.join(format!("{}.plan.json", plan.plan_id));
+            if let Some(parent) = path.parent() {
+                let _ = tokio::fs::create_dir_all(parent).await;
+            }
+            if tokio::fs::write(&path, &json).await.is_ok() {
+                out.push_str(&format!("\n\n已写入 {}", path.display()));
+            }
+        }
+        Ok(ToolOutput::new(out))
+    }
+}
+
+/// Tool: execute a test plan.
+pub struct RunTestTool;
+
+#[async_trait]
+impl Tool for RunTestTool {
+    fn name(&self) -> &str {
+        "gcode_run_test"
+    }
+
+    fn description(&self) -> &str {
+        "Execute a measurement test plan and return a PASS/FAIL report with deviations and \
+         attribution. Steps that energise the board require explicit user confirmation \
+         (user_confirmed=true); without it they are refused and recorded, never run. Measured \
+         values always come from an instrument: never report a simulated or estimated number as a \
+         measurement."
+    }
+
+    fn parameters_schema(&self) -> Value {
+        serde_json::json!({
+            "type": "object",
+            "properties": {
+                "plan": {"type": "object", "description": "The test plan (from gcode_plan_test)"},
+                "plan_path": {"type": "string", "description": "Or a path to a plan JSON file"},
+                "user_confirmed": {"type": "boolean", "description": "True only when the user has approved energising the board for this run"},
+                "meter": {"type": "string", "description": "Which instrument to measure with: auto | sigrok | virtual"},
+                "virtual_readings": {"type": "object", "description": "For meter=virtual only: quantity -> value (e.g. {\"VoltageDc\": 2.449, \"CurrentDc\": 0.01})"},
+                "virtual_error_pct": {"type": "number", "description": "For meter=virtual: inject a systematic error percentage"},
+                "dc_tol_pct": {"type": "number", "description": "Override the KR2 DC tolerance (default 10%)"},
+                "ac_freq_tol_pct": {"type": "number", "description": "Override the KR2 AC-frequency tolerance (default 20%)"},
+                "out_dir": {"type": "string", "description": "Where to write the report"}
+            }
+        })
+    }
+
+    async fn execute(&self, input: Value, ctx: ToolContext) -> anyhow::Result<ToolOutput> {
+        run_test(input, ctx, None).await
+    }
+}
+
+fn build_plan(input: &Value) -> Result<gcode_instrument::TestPlan, String> {
+    if let Some(id) = input.get("circuit_id").and_then(|v| v.as_str()) {
+        let recipe = input.get("recipe").and_then(|v| v.as_str());
+        return gcode_instrument::TestPlan::from_recipe(id, recipe).map_err(|e| e.to_string());
+    }
+    let Some(steps) = input.get("steps").and_then(|v| v.as_array()) else {
+        return Err("需要 circuit_id 或 steps 之一".into());
+    };
+    let plan_id = input
+        .get("plan_id")
+        .and_then(|v| v.as_str())
+        .unwrap_or("tp-manual");
+    let mut built = Vec::new();
+    for (i, s) in steps.iter().enumerate() {
+        let target = s
+            .get("target")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| format!("步骤 {} 缺少 target", i + 1))?;
+        let quantity = match s.get("quantity").and_then(|v| v.as_str()) {
+            Some("VoltageDc") => gcode_instrument::Quantity::VoltageDc,
+            Some("CurrentDc") => gcode_instrument::Quantity::CurrentDc,
+            Some("Resistance") => gcode_instrument::Quantity::Resistance,
+            Some("Continuity") => gcode_instrument::Quantity::Continuity,
+            Some("Frequency") => gcode_instrument::Quantity::Frequency,
+            other => return Err(format!("步骤 {} 的 quantity 无效：{other:?}", i + 1)),
+        };
+        let expected_value = s
+            .get("expected_value")
+            .and_then(|v| v.as_f64())
+            .ok_or_else(|| {
+                format!(
+                    "步骤 {}（{target}）没有预期值：预期值必须来自仿真或用户显式输入，不能凭空设定",
+                    i + 1
+                )
+            })?;
+        let tol_pct = s.get("tol_pct").and_then(|v| v.as_f64()).unwrap_or(0.0);
+        let unit = s
+            .get("unit")
+            .and_then(|v| v.as_str())
+            .unwrap_or_else(|| quantity.unit());
+        let rationale = s
+            .get("rationale")
+            .and_then(|v| v.as_str())
+            .unwrap_or("用户显式输入");
+        let mut step = gcode_instrument::TestStep::new(
+            i + 1,
+            target,
+            quantity,
+            gcode_instrument::Expected::from_user(expected_value, tol_pct, unit, rationale),
+        );
+        if let Some(v) = s.get("powered_voltage").and_then(|v| v.as_f64()) {
+            let limit = s.get("current_limit").and_then(|v| v.as_f64()).unwrap_or(0.2);
+            step = step.powered(v, limit);
+            if let Some(ec) = s.get("expected_current").and_then(|v| v.as_f64()) {
+                step = step.with_expected_current(ec);
+            }
+        }
+        built.push(step);
+    }
+    gcode_instrument::TestPlan::new(plan_id, built).map_err(|e| e.to_string())
+}
+
+/// Shared implementation, with an injectable backend for tests.
+async fn run_test(
+    input: Value,
+    ctx: ToolContext,
+    meter_override: Option<Box<dyn gcode_instrument::Instrument>>,
+) -> anyhow::Result<ToolOutput> {
+    // 1) Obtain the plan.
+    let plan = if let Some(p) = input.get("plan") {
+        match serde_json::from_value::<gcode_instrument::TestPlan>(p.clone()) {
+            Ok(plan) => plan,
+            Err(e) => return Ok(ToolOutput::new(format!("计划 JSON 无效：{e}"))),
+        }
+    } else if let Some(path) = input.get("plan_path").and_then(|v| v.as_str()) {
+        let abs = ctx.resolve_path(Path::new(path));
+        match tokio::fs::read_to_string(&abs).await {
+            Ok(text) => match gcode_instrument::TestPlan::from_json(&text) {
+                Ok(plan) => plan,
+                Err(e) => return Ok(ToolOutput::new(format!("计划文件无效：{e}"))),
+            },
+            Err(e) => return Ok(ToolOutput::new(format!("无法读取计划文件：{e}"))),
+        }
+    } else {
+        return Ok(ToolOutput::new(
+            "需要 plan（来自 gcode_plan_test）或 plan_path。".to_string(),
+        ));
+    };
+    if let Err(e) = plan.validate() {
+        return Ok(ToolOutput::new(format!("计划校验失败：{e}")));
+    }
+
+    // 2) Confirmation: refuse loudly before attempting anything powered.
+    let user_confirmed = input
+        .get("user_confirmed")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let token = gcode_instrument::ConfirmToken::mint(user_confirmed);
+    let powered = plan.powered_steps().len();
+    if powered > 0 && token.is_none() {
+        let mut out = format!(
+            "该计划有 {powered} 个步骤需要给板子上电，但未获得用户确认，未执行任何带电操作。\n\
+             请向用户说明将要施加的电压/限流并取得明确同意，然后以 user_confirmed=true 重试。\n\n"
+        );
+        for s in plan.powered_steps() {
+            let supply = s.supply.as_ref().expect("powered step has a supply");
+            out.push_str(&format!(
+                "- 步骤 {} · {}：计划施加 {}V / 限流 {}A\n",
+                s.index, s.target, supply.voltage, supply.current_limit
+            ));
+        }
+        out.push_str(&format!(
+            "\n（提示：本会话还需 {} =1 才允许上电。）\n",
+            gcode_instrument::hal::ALLOW_SOURCE_ENV
+        ));
+        return Ok(ToolOutput::new(out));
+    }
+
+    // 3) Select the instrument.
+    let meter: Box<dyn gcode_instrument::Instrument> = match meter_override {
+        Some(m) => m,
+        None => {
+            let kind = input
+                .get("meter")
+                .and_then(|v| v.as_str())
+                .unwrap_or("auto");
+            match kind {
+                "virtual" => {
+                    let mut vi = gcode_instrument::instruments::VirtualInstrument::new();
+                    if let Some(readings) = input.get("virtual_readings").and_then(|v| v.as_object())
+                    {
+                        for (k, v) in readings {
+                            let q = match k.as_str() {
+                                "VoltageDc" => gcode_instrument::Quantity::VoltageDc,
+                                "CurrentDc" => gcode_instrument::Quantity::CurrentDc,
+                                "Resistance" => gcode_instrument::Quantity::Resistance,
+                                "Continuity" => gcode_instrument::Quantity::Continuity,
+                                "Frequency" => gcode_instrument::Quantity::Frequency,
+                                _ => continue,
+                            };
+                            if let Some(val) = v.as_f64() {
+                                vi.set_reading(q, val);
+                            }
+                        }
+                    }
+                    if let Some(e) = input.get("virtual_error_pct").and_then(|v| v.as_f64()) {
+                        vi = vi.with_error_percent(e);
+                    }
+                    Box::new(vi)
+                }
+                "sigrok" | "auto" => {
+                    match gcode_instrument::instruments::SigrokInstrument::probe().await {
+                        Ok(s) => Box::new(s),
+                        Err(e) => {
+                            return Ok(ToolOutput::new(format!(
+                                "没有可用的测量仪器：{e}\n\
+                                 （可选：接入 sigrok 兼容设备，或用 meter=virtual 并显式给出读数。）"
+                            )))
+                        }
+                    }
+                }
+                other => return Ok(ToolOutput::new(format!("未知 meter：{other}"))),
+            }
+        }
+    };
+
+    // 4) Execute, with the KR2 policy (optionally overridden).
+    let policy = match (
+        input.get("dc_tol_pct").and_then(|v| v.as_f64()),
+        input.get("ac_freq_tol_pct").and_then(|v| v.as_f64()),
+    ) {
+        (None, None) => gcode_instrument::TolerancePolicy::kr2_default(),
+        (dc, ac) => gcode_instrument::TolerancePolicy::override_with(
+            dc.unwrap_or(gcode_instrument::compare::KR2_DC_PCT),
+            ac.unwrap_or(gcode_instrument::compare::KR2_AC_FREQ_PCT),
+        ),
+    };
+    let report = gcode_instrument::Executor::new(meter.as_ref(), None)
+        .with_policy(policy)
+        .run(&plan, token.as_ref())
+        .await;
+
+    let mut out = report.render();
+    if let Some(dir) = input.get("out_dir").and_then(|v| v.as_str()) {
+        let abs = ctx.resolve_path(Path::new(dir));
+        match report.write(&abs, &plan.plan_id) {
+            Ok((json, txt)) => out.push_str(&format!(
+                "\n报告已写入：\n- {}\n- {}\n",
+                json.display(),
+                txt.display()
+            )),
+            Err(e) => out.push_str(&format!("\n报告写入失败：{e}\n")),
+        }
+    }
+    Ok(ToolOutput::new(out))
+}
 /// All Gcode tools, for registration with the jcode tool registry.
 pub fn all_tools() -> Vec<Box<dyn Tool>> {
     vec![
@@ -733,6 +1084,9 @@ pub fn all_tools() -> Vec<Box<dyn Tool>> {
         Box::new(ListSimRecipesTool),
         Box::new(RunSimulationTool),
         Box::new(CheckSimToolchainTool),
+        Box::new(ListInstrumentsTool),
+        Box::new(PlanTestTool),
+        Box::new(RunTestTool),
     ]
 }
 
@@ -767,7 +1121,7 @@ mod tests {
     fn registers_all_tools_with_unique_names() {
         let tools = all_tools();
         let names: Vec<&str> = tools.iter().map(|t| t.name()).collect();
-        assert_eq!(names.len(), 9);
+        assert_eq!(names.len(), 12);
         let mut sorted = names.clone();
         sorted.sort();
         sorted.dedup();
@@ -778,6 +1132,146 @@ mod tests {
         assert!(names.contains(&"gcode_run_simulation"));
         assert!(names.contains(&"gcode_list_sim_recipes"));
         assert!(names.contains(&"gcode_check_sim_toolchain"));
+        assert!(names.contains(&"gcode_list_instruments"));
+        assert!(names.contains(&"gcode_plan_test"));
+        assert!(names.contains(&"gcode_run_test"));
+    }
+
+    #[tokio::test]
+    async fn list_instruments_states_the_hard_limits() {
+        let out = ListInstrumentsTool
+            .execute(serde_json::json!({}), ctx())
+            .await
+            .unwrap();
+        assert!(out.output.contains("virtual"), "{}", out.output);
+        assert!(out.output.contains("sigrok"), "{}", out.output);
+        assert!(out.output.contains("serial-psu"), "{}", out.output);
+        assert!(out.output.contains("48V"), "{}", out.output);
+        assert!(out.output.contains("5A"), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn plan_test_derives_from_a_simulation_recipe() {
+        let out = PlanTestTool
+            .execute(serde_json::json!({"circuit_id": "voltage-divider"}), ctx())
+            .await
+            .unwrap();
+        assert!(out.output.contains("仿真基准"), "{}", out.output);
+        assert!(out.output.contains("需要上电"), "{}", out.output);
+        // The plan JSON must be included so it can be handed to gcode_run_test.
+        assert!(out.output.contains("\"plan_id\""), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn plan_test_refuses_a_step_without_an_expected_value() {
+        let out = PlanTestTool
+            .execute(
+                serde_json::json!({"steps": [{"target": "3V3 rail", "quantity": "VoltageDc"}]}),
+                ctx(),
+            )
+            .await
+            .unwrap();
+        assert!(out.output.contains("无法生成测试计划"), "{}", out.output);
+        assert!(out.output.contains("不能凭空设定"), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn run_test_refuses_powered_steps_without_confirmation() {
+        let plan = PlanTestTool
+            .execute(serde_json::json!({"circuit_id": "voltage-divider"}), ctx())
+            .await
+            .unwrap()
+            .output;
+        let json_start = plan.find('{').unwrap();
+        let json = &plan[json_start..];
+        // Trim any trailing prose after the JSON object.
+        let json = json.trim_end();
+        let value: Value = serde_json::from_str(json).expect("plan JSON parses");
+
+        let out = run_test(
+            serde_json::json!({"plan": value, "meter": "virtual"}),
+            ctx(),
+            None,
+        )
+        .await
+        .unwrap();
+        assert!(out.output.contains("未获得用户确认"), "{}", out.output);
+        assert!(out.output.contains("未执行任何带电操作"), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn run_test_needs_a_plan() {
+        let out = run_test(serde_json::json!({}), ctx(), None).await.unwrap();
+        assert!(out.output.contains("需要 plan"), "{}", out.output);
+    }
+
+    #[tokio::test]
+    async fn run_test_reports_pass_and_fail_for_virtual_readings() {
+        // A passive step, so no confirmation is needed.
+        let plan = serde_json::json!({
+            "plan_id": "tp-tool",
+            "steps": [{
+                "index": 1, "target": "R1", "quantity": "Resistance",
+                "channel": null, "samples": null, "reduce": "Mean", "supply": null,
+                "expected": {"value": 220.0, "tol_pct": 5.0, "unit": "ohm",
+                             "source": {"kind": "User"}, "rationale": "标称 220R"}
+            }]
+        });
+
+        let pass = run_test(
+            serde_json::json!({"plan": plan, "meter": "virtual",
+                               "virtual_readings": {"Resistance": 219.0}}),
+            ctx(),
+            None,
+        )
+        .await
+        .unwrap();
+        assert!(pass.output.contains("PASS"), "{}", pass.output);
+
+        let fail = run_test(
+            serde_json::json!({"plan": plan, "meter": "virtual",
+                               "virtual_readings": {"Resistance": 300.0}}),
+            ctx(),
+            None,
+        )
+        .await
+        .unwrap();
+        assert!(fail.output.contains("FAIL"), "{}", fail.output);
+        assert!(fail.output.contains("超出容差"), "{}", fail.output);
+        assert!(fail.output.contains("合成数据"), "{}", fail.output);
+    }
+
+    #[tokio::test]
+    async fn run_test_writes_a_report_when_asked() {
+        let dir = tmp("instr-report");
+        let plan = serde_json::json!({
+            "plan_id": "tp-write",
+            "steps": [{
+                "index": 1, "target": "R1", "quantity": "Resistance",
+                "channel": null, "samples": null, "reduce": "Mean", "supply": null,
+                "expected": {"value": 220.0, "tol_pct": 5.0, "unit": "ohm",
+                             "source": {"kind": "User"}, "rationale": "标称 220R"}
+            }]
+        });
+        let out = run_test(
+            serde_json::json!({"plan": plan, "meter": "virtual",
+                               "virtual_readings": {"Resistance": 220.0},
+                               "out_dir": dir.to_str().unwrap()}),
+            ctx(),
+            None,
+        )
+        .await
+        .unwrap();
+        assert!(out.output.contains("报告已写入"), "{}", out.output);
+        let mut found = 0;
+        for entry in std::fs::read_dir(&dir).unwrap().flatten() {
+            let name = entry.file_name().into_string().unwrap();
+            if name.ends_with(".report.json") || name.ends_with(".report.txt") {
+                found += 1;
+            }
+        }
+        assert_eq!(found, 2, "both report artifacts must exist");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[tokio::test]

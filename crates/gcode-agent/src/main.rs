@@ -110,7 +110,16 @@ async fn report_toolchain() {
         Ok(n) => format!("{} ({})", n.version, n.path.display()),
         Err(_) => "ngspice 不可用（生成/ERC 可用，仿真不可用）".to_string(),
     };
-    eprintln!("gcode: {kicad} · {ngspice} · 符号库 {symbols}");
+    let instrument = match gcode_instrument::instruments::SigrokInstrument::probe().await {
+        Ok(s) => format!("sigrok 设备 {}", s.device_label()),
+        Err(_) => "无测量仪器（实测不可用；生成/ERC/仿真照常）".to_string(),
+    };
+    let source = if gcode_instrument::hal::source_enabled() {
+        "允许上电"
+    } else {
+        "上电默认关闭"
+    };
+    eprintln!("gcode: {kicad} · {ngspice} · {instrument} · {source} · 符号库 {symbols}");
 }
 
 #[cfg(test)]

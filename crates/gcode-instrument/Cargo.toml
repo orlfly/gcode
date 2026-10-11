@@ -18,4 +18,7 @@ async-trait = { workspace = true }
 tokio = { version = "1", features = ["process", "fs", "rt", "time", "macros", "io-util"] }
 
 [dev-dependencies]
+gcode-kicad = { workspace = true }
+gcode-sim = { workspace = true }
+async-trait = { workspace = true }
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
