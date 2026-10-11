@@ -2400,6 +2400,7 @@ dependencies = [
  "async-trait",
  "gcode-instrument",
  "gcode-kicad",
+ "gcode-laser",
  "gcode-sim",
  "jcode",
  "serde_json",

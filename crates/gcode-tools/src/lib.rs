@@ -10,6 +10,16 @@
 //! - `gcode_apply_edit` — diff a change, write only after explicit confirmation
 //! - `gcode_search_symbols` — component library lookup
 //! - `gcode_check_toolchain` — report kicad-cli availability/version
+//!
+//! R2 fabrication (see `laser.rs`):
+//!
+//! - `gcode_import_fab` — parse Gerber/Excellon and report what was found
+//! - `gcode_laser_job` — plan the laser job and export G-code + SVG
+//! - `gcode_laser_params` — laser parameter starting points with sources
+
+mod laser;
+
+pub use laser::{ImportFabTool, LaserParamsTool, PlanLaserJobTool};
 
 use async_trait::async_trait;
 use gcode_kicad::edit::FileEdit;
@@ -1087,6 +1097,9 @@ pub fn all_tools() -> Vec<Box<dyn Tool>> {
         Box::new(ListInstrumentsTool),
         Box::new(PlanTestTool),
         Box::new(RunTestTool),
+        Box::new(ImportFabTool),
+        Box::new(PlanLaserJobTool),
+        Box::new(LaserParamsTool),
     ]
 }
 
@@ -1121,7 +1134,7 @@ mod tests {
     fn registers_all_tools_with_unique_names() {
         let tools = all_tools();
         let names: Vec<&str> = tools.iter().map(|t| t.name()).collect();
-        assert_eq!(names.len(), 12);
+        assert_eq!(names.len(), 15);
         let mut sorted = names.clone();
         sorted.sort();
         sorted.dedup();
@@ -1135,6 +1148,9 @@ mod tests {
         assert!(names.contains(&"gcode_list_instruments"));
         assert!(names.contains(&"gcode_plan_test"));
         assert!(names.contains(&"gcode_run_test"));
+        assert!(names.contains(&"gcode_import_fab"));
+        assert!(names.contains(&"gcode_laser_job"));
+        assert!(names.contains(&"gcode_laser_params"));
     }
 
     #[tokio::test]
